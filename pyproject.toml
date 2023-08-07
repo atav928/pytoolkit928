@@ -1,0 +1,42 @@
+[build-system]
+build-backend= "setuptools.build_meta"
+requires = [
+    "setuptools",
+    "wheel",
+    "attrs",
+]
+
+[project]
+name = "py-mailer"
+authors = [
+    {name = "atav928", email = "dev@tavnets.com"}
+]
+description = "Toolkit"
+requires-python = ">=3.7,<4"
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: Implementation",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+dynamic = ["version", "readme", "dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+readme = {file = ["README.md"], content-type = "text/markdown"}
+version = {attr = "py_mailer.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src", "tests"]
+include = ["py_mailer*"]
+exclude = ["*.xml"]
+namespaces = true
+
+[tool.coverage.run]
+source = ["src"]
+
+[tool.pylint]
+max-line-length = 101
