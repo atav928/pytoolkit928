@@ -1,5 +1,9 @@
-from py_mailer import logger
-from py_mailer._version import __version__
+"""Init."""
+
+from pytoolkit._version import __version__
+from pytoolkit.py_mailer.mailer import send_mail
+
+
 # Enumerator type
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)

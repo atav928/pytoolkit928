@@ -1,22 +1,20 @@
 """mailer"""
 
+from typing import List
 import smtplib
 import re
-import base64
+
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 
-_default_to = ['adam@example.com']
-_default_from = 'python-script@example.com'
-_default_cc = ['']
-_default_bcc = ['']
-_encoding = 'utf-8'
+from pytoolkit.utils import verify_list
+from pytoolkit.static import (DEFAULT_TO,DEFAULT_FROM,DEFAULT_CC,DEFAULT_BCC,ENCODING)
 
 
-def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Script", mail_to: list = _default_to,
-              mail_from: str = _default_from, mail_cc: list = _default_cc, mail_bcc: list = _default_bcc,
+def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Script", mail_to: list = DEFAULT_TO,
+              mail_from: str = DEFAULT_FROM, mail_cc: list = DEFAULT_CC, mail_bcc: list = DEFAULT_BCC,
               msg_html: str = None, attachment: str = None, port: int = 25):
     """Send Mail
 
@@ -43,15 +41,10 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
     :return: _description_
     :rtype: _type_
     """
-    
-
     # Handle if a string is passed
-    if not isinstance(mail_to, list):
-        mail_to = [mail_to]
-    if not isinstance(mail_cc, list):
-        mail_cc = [mail_cc]
-    if not isinstance(mail_bcc, list):
-        mail_bcc = [mail_bcc]
+    mail_to: List[str] = verify_list(value=mail_to)
+    mail_cc: List[str] = verify_list(value=mail_cc)
+    mail_bcc: List[str] = verify_list(value=mail_bcc)
 
     message = MIMEMultipart('alternative')
     message['Subject'] = subject
@@ -62,8 +55,8 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
 
     try:
         if attachment and isinstance(attachment, list):
-            for a in attachment:
-                with open(a, 'rb', encoding=_encoding) as attach:
+            for attach in attachment:
+                with open(attach, 'rb', encoding=ENCODING) as attach:
                     # add file as application/octet-stream
                     # email client can usually downlaoad this automatically as an attachemment
                     part = MIMEBase('application', 'octet-stream')
@@ -71,7 +64,7 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
                     # encode
                     encoders.encode_base64(part)
                 # Get Filename
-                split = re.findall(r"[\w']+", a)
+                split = re.findall(r"[\w']+", attach)
                 filename = f'{split[-2]}.{split[-1]}'
                 # Add header as key/value pair to attach part
                 part.add_header(
@@ -98,9 +91,3 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
         return f"SMTP Communication Error: {str(err)}"
     except Exception:
         return "SMTP Unknown Error"
-
-
-def convert_to_base64(filename):
-    with open(filename, 'rb') as img_file:
-        my_string = base64.b64decode(img_file.read())
-    return my_string
