@@ -1,11 +1,12 @@
+"""Create a custo CA."""
+
 import tempfile, certifi, os
 from pathlib import Path
-
-_encoding = 'utf-8'
+from pytoolkit.static import ENCODING
 
 class CustomCa:
     CUSTOM_CA = """adsfdslkfakfjalksdjfadfad \
-                    asdfflkdjskfajdsfjadsklfdsfa
+                    asdfflkdjskfajdsfjadsklfdsfa\
                     adsfsdsdfkjdfjasdkfjadsjflads"""
     def __init__(self, cafile, capath=None):
         self.cafile = cafile
@@ -31,14 +32,14 @@ class CustomCa:
         if not self.check_cafile(certifi.where()):
             raise FileNotFoundError
         customca = Path(self.CERT_PATH + '/customca.pem')
-        with open(certifi.where(), 'r', encoding=_encoding) as ca:
+        with open(certifi.where(), 'r', encoding=ENCODING) as ca:
             ca_data = ca.read()
-        with open(self.cafile, 'r', encoding=_encoding) as ca:
+        with open(self.cafile, 'r', encoding=ENCODING) as ca:
             custom_ca_data = ca.read()
         # write out file
         ca_data += "\nISSUER: CN=Enteprise Cert\n"
         ca_data += custom_ca_data
-        with open(customca, 'w', encoding=_encoding) as ca:
+        with open(customca, 'w', encoding=ENCODING) as ca:
             ca.write(ca_data)
         self.CUST_CA = str(customca)
 
