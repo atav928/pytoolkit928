@@ -83,7 +83,7 @@ class Settings(ABC):
         return Path.home()
 
 
-@dataclass
+
 class RotatingLog_Old(Settings):
     def __init__(self, name: str, logName='sample', logDir=None,
                  maxBytes=5242990, backupCount=5, mode='a', level='INFO'):
@@ -154,62 +154,3 @@ class RotatingLog(Logger):
         if self.stream:
             self.logger = logging.getLogger(name).addHandler(self.stream_handler)
         return logging.getLogger(name)
-
-    # def set_logdir(self):
-    #    return super().set_logdir()
-
-
-class Test:
-    name: str = ''
-    logDir: str = Path.home()
-    logName: str = 'sample.log'
-    maxBytes: int = 5242990
-    backupCount: int = 5
-    mode: str = 'a'
-    level: str = 'INFO'
-    level_set: dict = LOGVALUE
-
-    def __init__(self, *args, **kwargs):
-        # Set the 'name' variable
-        idx_start = 0
-        if self.name is not None:
-            try:
-                name = args[0]
-                idx_start = 1
-            except IndexError:
-                name = kwargs.pop(self.name, None)
-            setattr(self, self.name, name)
-        # Gather all the variables from the 'variables' class method
-        # from the args/kwargs into instance variables.
-        variables = kwargs.pop("variables", None)
-        if variables is None:
-            variables = type(self).variables()
-        # Sort the variables by order
-        variables = sorted(variables, key=lambda x: x.order)
-        for idx, var in enumerate(variables, idx_start):
-            varname = var.variable
-            try:
-                # Try to get the variables from 'args' first
-                varvalue = args[idx]
-            except IndexError:
-                # If it's not in args, get it from 'kwargs', or store a None in the variable
-                try:
-                    varvalue = kwargs.pop(varname)
-                except KeyError:
-                    # If None was stored in the variable, check if
-                    # there's a default value, and store that instead
-                    if var.default is not None:
-                        setattr(self, varname, var.default)
-                    else:
-                        setattr(self, varname, None)
-                    continue
-            # For member variables, store a list containing the value instead of the individual value
-            # if var.vartype in ("member", "entry"):
-            #    varvalue = tools.string_or_list(varvalue)
-            # Store the value in the instance variable
-            #setattr(self, varname, varvalue)
-
-    @classmethod
-    def variables(cls):
-        """Defines the variables that exist in this object. Override in each subclass."""
-        return ()
