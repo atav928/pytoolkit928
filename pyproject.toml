@@ -7,7 +7,7 @@ requires = [
 ]
 
 [project]
-name = "pytoolkit"
+name = "pytoolkit928"
 authors = [
     {name = "atav928", email = "dev@tavnets.com"}
 ]
