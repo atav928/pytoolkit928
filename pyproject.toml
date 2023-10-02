@@ -11,7 +11,6 @@ name = "pytoolkit"
 authors = [
     {name = "atav928", email = "dev@tavnets.com"}
 ]
-description = "General use Python3 Toolkit"
 requires-python = ">=3.7,<4"
 license = {file = "LICENSE"}
 classifiers = [
@@ -22,12 +21,16 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10"
 ]
-dynamic = ["version", "readme", "dependencies"]
+dynamic = ["version", "readme", "dependencies","description"]
+
+[project.urls]
+homepage = "https://github.com/atav928/pytoolkit"
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}
 readme = {file = ["README.md"], content-type = "text/markdown"}
 version = {attr = "pytoolkit.__version__"}
+description = {file = "DESCRIPTION"}
 
 [tool.setuptools.packages.find]
 where = ["src", "tests"]
