@@ -1,7 +1,10 @@
 """Utilities."""
 
-from typing import Any,List
+from enum import Enum
+from typing import Any, List
 import base64
+import re
+
 
 def verify_list(value: Any) -> List[str]:
     """
@@ -15,11 +18,12 @@ def verify_list(value: Any) -> List[str]:
     """
     if not isinstance(value, list) and isinstance(value, str):
         return value.split(',')
-    if isinstance(value,list):
+    if isinstance(value, list):
         return value  # type: ignore
     raise ValueError(f"Invalid value {value}")
 
-def convert_to_base64(filename: str):
+
+def convert_to_base64(filename: str) -> bytes:
     """
     Converts a file to a byte string off base64.
 
@@ -29,5 +33,63 @@ def convert_to_base64(filename: str):
     :rtype: base64
     """
     with open(filename, 'rb') as file:
-        my_string = base64.b64decode(file.read())
+        my_string: bytes = base64.b64decode(file.read())
     return my_string
+
+# Enumerator type
+def enum(*sequential, **named) -> type[Enum]:
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    reverse = dict(((v, k) for (k, v) in enums.items()))
+    enums["reverse_mapping"] = reverse
+    return type("Enum", (), enums)
+
+
+def isstring(arg):
+    try:
+        return isinstance(arg, basestring)
+    except NameError:
+        return isinstance(arg, str) or isinstance(arg, bytes)
+
+# Convenience methods used internally by module
+# Do not use these methods outside the module
+
+def string_or_list(value: Any) -> list[str]:
+    """
+    Return a list containing value.
+
+    This method allows flexibility in class __init__ arguments,
+    allowing you to pass a string, object, list, or tuple.
+    In all cases, a list will be returned.
+
+    :param value: a string, object, list, or tuple
+    :type value: str|obj|list|tuple
+    :return: list
+    :rtype: list[str]
+
+    :examples:
+        "string" -> [string]
+        ("t1", "t2") -> ["t1", "t2"]
+        ["l1", "l2"] -> ["l1", "l2"]
+        None -> None
+    """
+    if value is None:
+        return None  # type: ignore
+    if isstring(value):
+        return value.split(',')
+    return (list(value) if "__iter__" in dir(value) else [value,])
+
+def reformat_exception(error: Exception) -> str:
+    """
+    Reformates Exception to print out as a string pass for logging.
+
+    :param error: caught excpetion
+    :type error: Exception
+    :return: error as string
+    :rtype: str
+    """
+    resp: str = f"{type(error).__name__}: {str(error)}" if error else ""
+    # Replacing [ ] with list() due to issues with reading that format with some systems.
+    resp = re.sub(r"\'", "", resp)
+    resp = re.sub(r'\[', 'list(', resp)
+    resp = re.sub(r"\]", ')', resp)
+    return resp
