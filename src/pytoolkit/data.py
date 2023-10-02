@@ -1,3 +1,4 @@
+"""Data Module."""
 from dataclasses import dataclass, field
 
 sample_headers = {'test': 1}

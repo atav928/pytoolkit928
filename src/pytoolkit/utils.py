@@ -1,9 +1,12 @@
 """Utilities."""
 
 from enum import Enum
+from pathlib import Path
 from typing import Any, List
 import base64
 import re
+
+from pytoolkit.static import ENCODING
 
 
 def verify_list(value: Any) -> List[str]:
@@ -37,6 +40,8 @@ def convert_to_base64(filename: str) -> bytes:
     return my_string
 
 # Enumerator type
+
+
 def enum(*sequential, **named) -> type[Enum]:
     enums = dict(zip(sequential, range(len(sequential))), **named)
     reverse = dict(((v, k) for (k, v) in enums.items()))
@@ -52,6 +57,7 @@ def isstring(arg):
 
 # Convenience methods used internally by module
 # Do not use these methods outside the module
+
 
 def string_or_list(value: Any) -> list[str]:
     """
@@ -78,6 +84,7 @@ def string_or_list(value: Any) -> list[str]:
         return value.split(',')
     return (list(value) if "__iter__" in dir(value) else [value,])
 
+
 def reformat_exception(error: Exception) -> str:
     """
     Reformates Exception to print out as a string pass for logging.
@@ -93,3 +100,33 @@ def reformat_exception(error: Exception) -> str:
     resp = re.sub(r'\[', 'list(', resp)
     resp = re.sub(r"\]", ')', resp)
     return resp
+
+
+def return_filelines(filename: str) -> list[str]:
+    """
+    Return list of strings in a file.
+
+    :param filename: _description_
+    :type filename: str
+    :return: _description_
+    :rtype: list[str]
+    """
+    filelines: list[str] = []
+    with open(filename, 'r', encoding=ENCODING) as fil:
+        filelines = fil.readlines()
+    return filelines
+
+
+def check_file(filename: str) -> str:
+    """Check that filename exists and returns Pathlib object if does.
+
+    :param filename: Name of file; full path
+    :type filename: str
+    :raises FileExistsError: _description_
+    :return: File location
+    :rtype: Path
+    """
+    file: Path = Path(filename)
+    if not file.exists():
+        raise FileExistsError(f"Filename does not exist: {str(filename)}")
+    return filename
