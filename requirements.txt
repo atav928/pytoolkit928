@@ -1,1 +1,4 @@
 certifi
+decorator
+pathlib
+dataclasses

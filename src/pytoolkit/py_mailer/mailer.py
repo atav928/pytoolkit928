@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 
-from pytoolkit.utils import verify_list
+from pytoolkit.utils import string_or_list
 from pytoolkit.static import (DEFAULT_TO,DEFAULT_FROM,DEFAULT_CC,DEFAULT_BCC,ENCODING)
 
 
@@ -42,9 +42,9 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
     :rtype: _type_
     """
     # Handle if a string is passed
-    mail_to: List[str] = verify_list(value=mail_to)
-    mail_cc: List[str] = verify_list(value=mail_cc)
-    mail_bcc: List[str] = verify_list(value=mail_bcc)
+    mail_to: List[str] = string_or_list(value=mail_to)
+    mail_cc: List[str] = string_or_list(value=mail_cc)
+    mail_bcc: List[str] = string_or_list(value=mail_bcc)
 
     message = MIMEMultipart('alternative')
     message['Subject'] = subject
@@ -56,16 +56,17 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
     try:
         if attachment and isinstance(attachment, list):
             for attach in attachment:
-                with open(attach, 'rb', encoding=ENCODING) as attach:
-                    # add file as application/octet-stream
-                    # email client can usually downlaoad this automatically as an attachemment
-                    part = MIMEBase('application', 'octet-stream')
-                    part.set_payload(attach.read())
+                # add file as application/octet-stream
+                # email client can usually downlaoad this automatically as an attachemment
+                part = MIMEBase('application', 'octet-stream')
+                with open(attach, 'rb', encoding=ENCODING) as a:
+                    # Add encoded stream to MIMEBase app payload
+                    part.set_payload(a.read())
                     # encode
                     encoders.encode_base64(part)
                 # Get Filename
-                split = re.findall(r"[\w']+", attach)
-                filename = f'{split[-2]}.{split[-1]}'
+                split: list[str] = re.findall(r"[\w']+", attach)
+                filename: str = f'{split[-2]}.{split[-1]}'
                 # Add header as key/value pair to attach part
                 part.add_header(
                     "Content-Disposition",
