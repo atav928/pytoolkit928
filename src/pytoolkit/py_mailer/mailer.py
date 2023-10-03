@@ -42,9 +42,10 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
     :rtype: _type_
     """
     # Handle if a string is passed
-    mail_to: List[str] = string_or_list(value=mail_to)
-    mail_cc: List[str] = string_or_list(value=mail_cc)
-    mail_bcc: List[str] = string_or_list(value=mail_bcc)
+    delimeters = ',| '
+    mail_to: List[str] = string_or_list(value=mail_to,delimeters=delimeters)
+    mail_cc: List[str] = string_or_list(value=mail_cc,delimeters=delimeters)
+    mail_bcc: List[str] = string_or_list(value=mail_bcc,delimeters=delimeters)
 
     message = MIMEMultipart('alternative')
     message['Subject'] = subject
