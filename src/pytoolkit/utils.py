@@ -59,7 +59,7 @@ def isstring(arg):
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any) -> list[str]:
+def string_or_list(value: Any, delimeters: str=None) -> list[str]:
     """
     Return a list containing value.
 
@@ -69,6 +69,9 @@ def string_or_list(value: Any) -> list[str]:
 
     :param value: a string, object, list, or tuple
     :type value: str|obj|list|tuple
+    :param delimeter: use a delimeter in the string using pipe(|) as an OR for multiple.
+     (Optional) Default no delimeter used. Example: delimeters=',| |;|'
+    :type delimeter: str|None
     :return: list
     :rtype: list[str]
 
@@ -81,7 +84,7 @@ def string_or_list(value: Any) -> list[str]:
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return value.split(',')
+        return re.split(delimeters,value,flags=re.IGNORECASE) if delimeters else [value]
     return (list(value) if "__iter__" in dir(value) else [value,])
 
 
