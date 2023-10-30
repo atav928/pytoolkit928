@@ -22,6 +22,12 @@ __Example:__
 
 ## Releases
 
+### v0.0.4
+
+* Added Flatten Dictionary function.
+* Added Hostname and FQDN System Hostname return.
+* Added grabbing current username.
+
 ### v0.0.3
 
 * Added delimeter option.

@@ -1,10 +1,14 @@
 """Utilities."""
 
 from enum import Enum
+import os
 from pathlib import Path
-from typing import Any, List
+import pwd
+import socket
+from typing import Any, Generator, List, MutableMapping, Union
 import base64
 import re
+import yaml
 
 from pytoolkit.static import ENCODING
 
@@ -133,3 +137,81 @@ def check_file(filename: str) -> str:
     if not file.exists():
         raise FileExistsError(f"Filename does not exist: {str(filename)}")
     return filename
+
+def return_username(log:Any=None) -> Union[str,None]:
+    """
+    Return Username Information.
+
+    :param log: logger, defaults to None
+    :type log: Logger, optional
+    :return: username
+    :rtype: Union[str,None]
+    """
+    try:
+        return pwd.getpwuid(os.getuid())[0]
+    except Exception as err:
+        error: str = reformat_exception(err)
+        if log:
+            log.error(f"msg=\"Unable to get username\"|{error=}")
+    return None
+
+def return_hostinfo(fqdn:bool=True) -> str:
+    """
+    Return Hostname information on system.
+
+    :param fqdn: Retun FQDN or Hostname, defaults to True
+    :type fqdn: bool, optional
+    :return: System Hostname/FQDN
+    :rtype: str
+    """
+    if fqdn:
+        return socket.getfqdn()
+    return socket.gethostname()
+
+def _flatten_dict_gen(_d: MutableMapping[str,Any], parent_key: str,
+                      sep:str,extended_label:bool,
+                      skip_item:Union[list[str],None]) -> Generator[tuple[str, Any], Any, None]:
+    for k,v in _d.items():
+        if extended_label:
+            new_key: str = parent_key + sep + k if parent_key and k not in skip_item else k # type: ignore
+        else:
+            new_key: str = k
+        if isinstance(v, MutableMapping):
+            yield from flatten_dict(v,new_key,sep=sep).items()  # type: ignore
+        else:
+            yield new_key,v
+
+def flatten_dict(_dict: MutableMapping[str,Any], parent_key: str="",
+                 sep: str=".", extended_label: bool=False,
+                 skip_item: Union[list[str],None] = None) -> dict[str,Any]:
+    """
+    Flatten out a dictionary with nested values.
+
+    :param _dict: Dictionary
+    :type _dict: MutableMapping[str,Any]
+    :param parent_key: Top Level Key, defaults to ""
+    :type parent_key: str, optional
+    :param sep: Seperator, defaults to "."
+    :type sep: str, optional
+    :param extended_label: Uses the same key by default or appends the hierarchy
+     into the name of the key used to express the nesting structure, defaults to False
+    :type extended_label: bool, optional
+    :param skip_item: _description_, defaults to []
+    :type skip_item: list, optional
+    :return: Flattened Dictionary
+    :rtype: dict[str,Any]
+    """
+    return dict(_flatten_dict_gen(_dict,parent_key,sep,extended_label,skip_item))
+
+def read_yaml(filename: Path) -> dict[str,Any]:
+    """
+    Read in a YAML configuration file.
+
+    :param filename: Yaml File Full Path
+    :type filename: Path
+    :return: Yaml Configurations
+    :rtype: dict[str,Any]
+    """
+    with open(filename,'r', encoding=ENCODING) as r_yaml:
+        settings = yaml.safe_load(r_yaml)
+    return settings

@@ -2,3 +2,4 @@ certifi
 decorator
 pathlib
 dataclasses
+PyYaml
