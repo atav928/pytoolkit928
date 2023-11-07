@@ -3,6 +3,7 @@
 from enum import Enum
 import os
 from pathlib import Path
+import platform
 import pwd
 import socket
 from typing import Any, Generator, List, MutableMapping, Union
@@ -12,6 +13,14 @@ import yaml
 
 from pytoolkit.static import ENCODING
 
+def os_plat() -> str:
+    """
+    Return OS System.
+
+    :return: darwin, linux, java, windows.
+    :rtype: str
+    """
+    return platform.system().lower()
 
 def verify_list(value: Any) -> List[str]:
     """
@@ -32,7 +41,7 @@ def verify_list(value: Any) -> List[str]:
 
 def convert_to_base64(filename: str) -> bytes:
     """
-    Converts a file to a byte string off base64.
+    Convert a file to a byte string off base64.
 
     :param filename: Filename
     :type filename: str
@@ -53,11 +62,11 @@ def enum(*sequential, **named) -> type[Enum]:
     return type("Enum", (), enums)
 
 
-def isstring(arg):
+def isstring(arg: Any) -> bool:
     try:
         return isinstance(arg, basestring)
     except NameError:
-        return isinstance(arg, str) or isinstance(arg, bytes)
+        return isinstance(arg, (str,bytes))
 
 # Convenience methods used internally by module
 # Do not use these methods outside the module
