@@ -6,12 +6,15 @@ from pathlib import Path
 import platform
 import pwd
 import socket
-from typing import Any, Generator, List, MutableMapping, Union
+from typing import Any, Generator, List, Union
+from collections.abc import MutableMapping
 import base64
 import re
 import yaml
 
+import pandas as pd
 from pytoolkit.static import ENCODING
+
 
 def os_plat() -> str:
     """
@@ -21,6 +24,7 @@ def os_plat() -> str:
     :rtype: str
     """
     return platform.system().lower()
+
 
 def verify_list(value: Any) -> List[str]:
     """
@@ -66,13 +70,13 @@ def isstring(arg: Any) -> bool:
     try:
         return isinstance(arg, basestring)
     except NameError:
-        return isinstance(arg, (str,bytes))
+        return isinstance(arg, (str, bytes))
 
 # Convenience methods used internally by module
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any, delimeters: str=None) -> list[str]:
+def string_or_list(value: Any, delimeters: str = None) -> list[str]:
     """
     Return a list containing value.
 
@@ -97,7 +101,7 @@ def string_or_list(value: Any, delimeters: str=None) -> list[str]:
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return re.split(delimeters,value,flags=re.IGNORECASE) if delimeters else [value]
+        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
     return (list(value) if "__iter__" in dir(value) else [value,])
 
 
@@ -147,7 +151,8 @@ def check_file(filename: str) -> str:
         raise FileExistsError(f"Filename does not exist: {str(filename)}")
     return filename
 
-def return_username(log:Any=None) -> Union[str,None]:
+
+def return_username(log: Any = None) -> Union[str, None]:
     """
     Return Username Information.
 
@@ -164,7 +169,8 @@ def return_username(log:Any=None) -> Union[str,None]:
             log.error(f"msg=\"Unable to get username\"|{error=}")
     return None
 
-def return_hostinfo(fqdn:bool=True) -> str:
+
+def return_hostinfo(fqdn: bool = True) -> str:
     """
     Return Hostname information on system.
 
@@ -177,22 +183,26 @@ def return_hostinfo(fqdn:bool=True) -> str:
         return socket.getfqdn()
     return socket.gethostname()
 
-def _flatten_dict_gen(_d: MutableMapping[str,Any], parent_key: str,
-                      sep:str,extended_label:bool,
-                      skip_item:Union[list[str],None]) -> Generator[tuple[str, Any], Any, None]:
-    for k,v in _d.items():
+
+def _flatten_dict_gen(_d: MutableMapping[str, Any], parent_key: str,
+                      sep: str, extended_label: bool,
+                      skip_item: Union[list[str], None]) -> Generator[tuple[str, Any], Any, None]:
+    for k, v in _d.items():
         if extended_label:
-            new_key: str = parent_key + sep + k if parent_key and k not in skip_item else k # type: ignore
+            new_key: str = parent_key + sep + \
+                k if parent_key and k not in skip_item else k  # type: ignore
         else:
             new_key: str = k
         if isinstance(v, MutableMapping):
-            yield from flatten_dict(v,new_key,sep=sep).items()  # type: ignore
+            # type: ignore
+            yield from flatten_dict(v, new_key, sep=sep).items()
         else:
-            yield new_key,v
+            yield new_key, v
 
-def flatten_dict(_dict: MutableMapping[str,Any], parent_key: str="",
-                 sep: str=".", extended_label: bool=False,
-                 skip_item: Union[list[str],None] = None) -> dict[str,Any]:
+
+def flatten_dict(_dict: MutableMapping[str, Any], parent_key: str = "",
+                 sep: str = ".", extended_label: bool = False,
+                 skip_item: Union[list[str], None] = None) -> dict[str, Any]:
     """
     Flatten out a dictionary with nested values.
 
@@ -210,9 +220,36 @@ def flatten_dict(_dict: MutableMapping[str,Any], parent_key: str="",
     :return: Flattened Dictionary
     :rtype: dict[str,Any]
     """
-    return dict(_flatten_dict_gen(_dict,parent_key,sep,extended_label,skip_item))
+    return dict(_flatten_dict_gen(_dict, parent_key, sep, extended_label, skip_item))
 
-def read_yaml(filename: Path) -> dict[str,Any]:
+def flatten_dictionary(d: MutableMapping, sep: str= '.') -> MutableMapping:
+    """
+    Flatten a dictionary via pandas normalizer.
+
+    :param d: _description_
+    :type d: MutableMapping
+    :param sep: _description_, defaults to '.'
+    :type sep: str, optional
+    :return: _description_
+    :rtype: MutableMapping
+    """
+    [flat_dict] = pd.json_normalize(d, sep=sep).to_dict(orient='records')
+    return flat_dict
+
+def nest_dict(flat,sep:str='_'):
+    result = {}
+    for k, v in flat.items():
+        _nest_dict_rec(k, v, sep, result)
+    return result
+
+def _nest_dict_rec(k, v, sep, out):
+    k, *rest = k.split(sep, 1)
+    if rest:
+        _nest_dict_rec(rest[0], v, sep, out.setdefault(k, {}))
+    else:
+        out[k] = v
+
+def read_yaml(filename: Path) -> dict[str, Any]:
     """
     Read in a YAML configuration file.
 
@@ -221,6 +258,6 @@ def read_yaml(filename: Path) -> dict[str,Any]:
     :return: Yaml Configurations
     :rtype: dict[str,Any]
     """
-    with open(filename,'r', encoding=ENCODING) as r_yaml:
+    with open(filename, 'r', encoding=ENCODING) as r_yaml:
         settings = yaml.safe_load(r_yaml)
     return settings
