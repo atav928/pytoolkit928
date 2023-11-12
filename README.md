@@ -20,6 +20,18 @@ __Example:__
 ['string1', 'string2', 'string3', 'string4']
 ```
 
+### Maniuplating Dictionaries
+
+__Flatten a Dictionary:__
+
+__Nested Dictionary:__
+
+__TOOD:__ Create a way to extract a CSV or XCEL file and turn it into a proper dictionary based on the type. Integrate with Splunk
+
+__TODO:__ Add splunk HEC fromatter with proper chunck
+
+__TODO:__ KVSTORE configuration tool.
+
 ## Releases
 
 ### v0.0.4

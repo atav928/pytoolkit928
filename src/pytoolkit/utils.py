@@ -236,6 +236,7 @@ def flatten_dictionary(d: MutableMapping, sep: str= '.') -> MutableMapping:
     [flat_dict] = pd.json_normalize(d, sep=sep).to_dict(orient='records')
     return flat_dict
 
+# TODO: fix the nested structure add abiltiy to read in a csv or XCEL fie and manulate the way needed this would help with splunk
 def nest_dict(flat,sep:str='_'):
     result = {}
     for k, v in flat.items():

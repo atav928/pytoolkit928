@@ -3,7 +3,7 @@
 import datetime
 from typing import Any, Union
 
-
+# TODO: fix the abilit to send HEC formats in chuncks.
 def splunk_hec_format(host: str, source: str, sourcetype: str,
                       metrics_list: Union[list[str],None] = None,
                       **kwargs: Any) -> dict[str, Any]:
