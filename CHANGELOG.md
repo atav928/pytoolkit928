@@ -1,5 +1,11 @@
 # Releases
 
+## v0.0.5
+
+* Added nest dict function.
+* Added Unit testing.
+* Updated Readme.
+
 ## v0.0.4
 
 * Added Flatten Dictionary function.

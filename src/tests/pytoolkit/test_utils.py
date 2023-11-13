@@ -8,7 +8,6 @@ from pytoolkit import utils
 class TestStringMethods(unittest.TestCase):
     def test_os(self) -> None:
         s: str = utils.os_plat()
-        print(s)
         self.assertIn(s, ['darwin', 'linux', 'windows', 'java'])
 
     def test_isstring(self) -> None:
