@@ -1,9 +1,22 @@
 """Splunk Integrations."""
 
+from collections import OrderedDict
 import datetime
 from typing import Any, Union
 
+def splunk_format(**kwargs: Any) -> str:
+    """
+    Reformat a list of key:value pairs into a simple logging message for Splunk.
 
+    :return: _description_
+    :rtype: str
+    """
+    ordered: OrderedDict[str, Any] = OrderedDict(sorted(kwargs.items()))
+    string: list[str] = [f"{str(key)}=\"{value}\"" for key, value in ordered.items()]
+    return ','.join(string)
+
+
+# TODO: fix the abilit to send HEC formats in chuncks.
 def splunk_hec_format(host: str, source: str, sourcetype: str,
                       metrics_list: Union[list[str],None] = None,
                       **kwargs: Any) -> dict[str, Any]:

@@ -6,12 +6,12 @@ from pathlib import Path
 import platform
 import pwd
 import socket
-from typing import Any, Generator, List, MutableMapping, Union
+from typing import Any, List, Union
 import base64
 import re
-import yaml
 
 from pytoolkit.static import ENCODING
+
 
 def os_plat() -> str:
     """
@@ -21,6 +21,7 @@ def os_plat() -> str:
     :rtype: str
     """
     return platform.system().lower()
+
 
 def verify_list(value: Any) -> List[str]:
     """
@@ -66,13 +67,13 @@ def isstring(arg: Any) -> bool:
     try:
         return isinstance(arg, basestring)
     except NameError:
-        return isinstance(arg, (str,bytes))
+        return isinstance(arg, (str, bytes))
 
 # Convenience methods used internally by module
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any, delimeters: str=None) -> list[str]:
+def string_or_list(value: Any, delimeters: str = None) -> list[str]:
     """
     Return a list containing value.
 
@@ -97,7 +98,7 @@ def string_or_list(value: Any, delimeters: str=None) -> list[str]:
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return re.split(delimeters,value,flags=re.IGNORECASE) if delimeters else [value]
+        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
     return (list(value) if "__iter__" in dir(value) else [value,])
 
 
@@ -147,7 +148,8 @@ def check_file(filename: str) -> str:
         raise FileExistsError(f"Filename does not exist: {str(filename)}")
     return filename
 
-def return_username(log:Any=None) -> Union[str,None]:
+
+def return_username(log: Any = None) -> Union[str, None]:
     """
     Return Username Information.
 
@@ -164,7 +166,8 @@ def return_username(log:Any=None) -> Union[str,None]:
             log.error(f"msg=\"Unable to get username\"|{error=}")
     return None
 
-def return_hostinfo(fqdn:bool=True) -> str:
+
+def return_hostinfo(fqdn: bool = True) -> str:
     """
     Return Hostname information on system.
 
@@ -177,50 +180,24 @@ def return_hostinfo(fqdn:bool=True) -> str:
         return socket.getfqdn()
     return socket.gethostname()
 
-def _flatten_dict_gen(_d: MutableMapping[str,Any], parent_key: str,
-                      sep:str,extended_label:bool,
-                      skip_item:Union[list[str],None]) -> Generator[tuple[str, Any], Any, None]:
-    for k,v in _d.items():
-        if extended_label:
-            new_key: str = parent_key + sep + k if parent_key and k not in skip_item else k # type: ignore
-        else:
-            new_key: str = k
-        if isinstance(v, MutableMapping):
-            yield from flatten_dict(v,new_key,sep=sep).items()  # type: ignore
-        else:
-            yield new_key,v
 
-def flatten_dict(_dict: MutableMapping[str,Any], parent_key: str="",
-                 sep: str=".", extended_label: bool=False,
-                 skip_item: Union[list[str],None] = None) -> dict[str,Any]:
-    """
-    Flatten out a dictionary with nested values.
+def set_bool(value: str, default: bool = False):
+    """sets bool value when pulling string from os env
 
-    :param _dict: Dictionary
-    :type _dict: MutableMapping[str,Any]
-    :param parent_key: Top Level Key, defaults to ""
-    :type parent_key: str, optional
-    :param sep: Seperator, defaults to "."
-    :type sep: str, optional
-    :param extended_label: Uses the same key by default or appends the hierarchy
-     into the name of the key used to express the nesting structure, defaults to False
-    :type extended_label: bool, optional
-    :param skip_item: _description_, defaults to []
-    :type skip_item: list, optional
-    :return: Flattened Dictionary
-    :rtype: dict[str,Any]
-    """
-    return dict(_flatten_dict_gen(_dict,parent_key,sep,extended_label,skip_item))
+    Args:
+        value (str|bool, Required): the value to evaluate
+        default (bool): default return bool value. Default False
 
-def read_yaml(filename: Path) -> dict[str,Any]:
+    Returns:
+        (str|bool): String if certificate path is passed otherwise True|False
     """
-    Read in a YAML configuration file.
-
-    :param filename: Yaml File Full Path
-    :type filename: Path
-    :return: Yaml Configurations
-    :rtype: dict[str,Any]
-    """
-    with open(filename,'r', encoding=ENCODING) as r_yaml:
-        settings = yaml.safe_load(r_yaml)
-    return settings
+    value_bool = default
+    if isinstance(value, bool):
+        value_bool = value
+    elif str(value).lower() == 'true':
+        value_bool = True
+    elif str(value).lower() == 'false':
+        value_bool = False
+    elif Path.exists(Path(value)):
+        value_bool = value
+    return value_bool
