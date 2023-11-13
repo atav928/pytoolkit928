@@ -5,6 +5,7 @@ from collections.abc import MutableMapping
 
 import pandas as pd
 
+
 def _flatten_dict_gen(_d: MutableMapping[str, Any], parent_key: str,
                       sep: str, extended_label: bool,
                       skip_item: list[str]) -> Generator[tuple[str, Any], Any, None]:
@@ -60,19 +61,18 @@ def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = '.') -> dict[
     [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(orient='records')
     return flat_dict
 
-# TODO: fix the nested structure add abiltiy to read in a csv or XCEL fie and manulate the way needed this would help with splunk
+# TODO: fix the nested structure add abiltiy to read in a csv or XCEL to help maniplate proper csv human readable datastructures
 
 
-def _nest_dict_rec(key: str, value: Any, sep: str, out: Any):
+def _nest_dict_rec(key: str, value: Any, sep: str, out: dict[str, Any]) -> None:
     key, *rest = key.split(sep, 1)
     if rest:
-        yield from _nest_dict_rec(rest[0], value, sep, out.setdefault(key, {}))
+        _nest_dict_rec(rest[0], value, sep, out.setdefault(key, {}))
     else:
-        # out[key] = value
-        yield out
+        out[key] = value
 
 
-def nest_dict(flat: MutableMapping[str, Any], sep: str = '.') -> dict[str, Any]:
+def nested_dict(flat: MutableMapping[str, Any], sep: str = '.') -> dict[str, Any]:
     """
     Transform a Flattened Dictionary into a Nested Dictionary.
 
