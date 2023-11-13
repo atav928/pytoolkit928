@@ -3,9 +3,25 @@
 from pathlib import Path
 import platform
 import tempfile
+from typing import Any, Union
+import yaml
 
+from pytoolkit.static import ENCODING
 
-def get_log_dir(extend_path: str = None) -> str:
+def read_yaml(filename: Path) -> dict[str, Any]:
+    """
+    Read in a YAML configuration file.
+
+    :param filename: Yaml File Full Path
+    :type filename: Path
+    :return: Yaml Configurations
+    :rtype: dict[str,Any]
+    """
+    with open(filename, 'r', encoding=ENCODING) as r_yaml:
+        settings = yaml.safe_load(r_yaml)
+    return settings
+
+def get_log_dir(extend_path: Union[str,None] = None) -> str:
     """
     Get default log directory depending on OS. Extend to application path if path supplied.
 
@@ -46,7 +62,6 @@ def get_log_home() -> str:
     return str(Path.home())
 
 
-def with_suffix(logName) -> str:
+def with_suffix(logName: str) -> str:
     """Add suffix to logname."""
-
     return str(Path(logName).with_suffix('.log'))

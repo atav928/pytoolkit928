@@ -6,13 +6,10 @@ from pathlib import Path
 import platform
 import pwd
 import socket
-from typing import Any, Generator, Hashable, List, Union
-from collections.abc import MutableMapping
+from typing import Any, List, Union
 import base64
 import re
-import yaml
 
-import pandas as pd
 from pytoolkit.static import ENCODING
 
 
@@ -182,104 +179,6 @@ def return_hostinfo(fqdn: bool = True) -> str:
     if fqdn:
         return socket.getfqdn()
     return socket.gethostname()
-
-
-def _flatten_dict_gen(_d: MutableMapping[str, Any], parent_key: str,
-                      sep: str, extended_label: bool,
-                      skip_item: list[str]) -> Generator[tuple[str, Any], Any, None]:
-    for k, v in _d.items():
-        new_key: str = k
-        if extended_label:
-            new_key: str = parent_key + sep + \
-                k if (parent_key and k not in skip_item) else k  # type: ignore
-        if isinstance(v, MutableMapping):
-            yield from flatten_dict(v,  # type: ignore
-                                    new_key, extended_label=extended_label,
-                                    skip_item=skip_item,
-                                    sep=sep).items()
-        else:
-            yield new_key, v
-
-
-def flatten_dict(_dict: MutableMapping[str, Any], parent_key: str = "",
-                 sep: str = ".", extended_label: bool = True,
-                 skip_item: Union[list[str], None] = None) -> dict[str, Any]:
-    """
-    Flatten out a dictionary with nested values.
-
-    :param _dict: Dictionary
-    :type _dict: MutableMapping[str,Any]
-    :param parent_key: Top Level Key, defaults to ""
-    :type parent_key: str, optional
-    :param sep: Seperator, defaults to "."
-    :type sep: str, optional
-    :param extended_label: Uses the same key by default or appends the hierarchy
-     into the name of the key used to express the nesting structure, defaults to True
-    :type extended_label: bool, optional
-    :param skip_item: List of Keys to ignore and flatten without the parent, defaults to []
-    :type skip_item: list, optional
-    :return: Flattened Dictionary
-    :rtype: dict[str,Any]
-    """
-    skip_item = skip_item if skip_item else [""]
-    return dict(_flatten_dict_gen(_dict, parent_key, sep, extended_label, skip_item))
-
-
-def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = '.') -> dict[Hashable, Any]:
-    """
-    Flatten a dictionary via pandas normalizer.
-
-    :param d: _description_
-    :type d: MutableMapping
-    :param sep: _description_, defaults to '.'
-    :type sep: str, optional
-    :return: _description_
-    :rtype: MutableMapping
-    """
-    [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(orient='records')
-    return flat_dict
-
-# TODO: fix the nested structure add abiltiy to read in a csv or XCEL fie and manulate the way needed this would help with splunk
-
-
-def _nest_dict_rec(key: str, value: Any, sep: str, out: Any):
-    key, *rest = key.split(sep, 1)
-    if rest:
-        yield from _nest_dict_rec(rest[0], value, sep, out.setdefault(key, {}))
-    else:
-        # out[key] = value
-        yield out
-
-
-def nest_dict(flat: MutableMapping[str, Any], sep: str = '.') -> dict[str, Any]:
-    """
-    Transform a Flattened Dictionary into a Nested Dictionary.
-
-    :param flat: _description_
-    :type flat: MutableMapping[str, Any]
-    :param sep: _description_, defaults to '.'
-    :type sep: str, optional
-    :return: _description_
-    :rtype: dict[str, Any]
-    """
-    result: dict[str, Any] = {}
-    for k, v in flat.items():
-        _nest_dict_rec(k, v, sep, result)
-    return result
-
-
-def read_yaml(filename: Path) -> dict[str, Any]:
-    """
-    Read in a YAML configuration file.
-
-    :param filename: Yaml File Full Path
-    :type filename: Path
-    :return: Yaml Configurations
-    :rtype: dict[str,Any]
-    """
-    with open(filename, 'r', encoding=ENCODING) as r_yaml:
-        settings = yaml.safe_load(r_yaml)
-    return settings
 
 
 def set_bool(value: str, default: bool = False):
