@@ -3,6 +3,7 @@
 ## v0.0.6
 
 * Added Base Monitor for dataclass that includes some common methods.
+* Added Unit test and set pass to 50%.
 
 ## v0.0.5
 
