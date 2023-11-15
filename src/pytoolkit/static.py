@@ -1,7 +1,10 @@
 """Global Static Vars."""
 
+from typing import cast
+
 ENCODING: str = 'utf-8'
 
+NONETYPE: None = cast(None, object())
 DEFAULT_TO: list[str] = ['john.doe@acme.com']
 DEFAULT_FROM: str = 'python-script@acme.com'
 DEFAULT_CC: list[str] = ['']

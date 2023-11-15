@@ -1,6 +1,6 @@
 """mailer"""
 
-from typing import List
+from typing import List, Union
 import smtplib
 import re
 
@@ -13,9 +13,13 @@ from pytoolkit.utils import string_or_list
 from pytoolkit.static import (DEFAULT_TO,DEFAULT_FROM,DEFAULT_CC,DEFAULT_BCC,ENCODING)
 
 
-def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Script", mail_to: list = DEFAULT_TO,
-              mail_from: str = DEFAULT_FROM, mail_cc: list = DEFAULT_CC, mail_bcc: list = DEFAULT_BCC,
-              msg_html: str = None, attachment: str = None, port: int = 25):
+def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Script",
+              mail_to: Union[list[str],str] = DEFAULT_TO,
+              mail_from: str = DEFAULT_FROM,
+              mail_cc: Union[list[str],str] = DEFAULT_CC,
+              mail_bcc: Union[list[str],str] = DEFAULT_BCC,
+              msg_html: Union[str,None] = None,
+              attachment: Union[str,None] = None, port: int = 25):
     """Send Mail
 
     :param smtp_server: _description_

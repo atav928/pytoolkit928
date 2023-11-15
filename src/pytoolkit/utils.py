@@ -56,7 +56,22 @@ def convert_to_base64(filename: str) -> bytes:
 # Enumerator type
 
 
-def enum(*sequential, **named) -> type[Enum]:
+def enum(*sequential:Any, **named:Any) -> type[Enum]:
+    """
+    Support for converting the values back to names can be added.
+
+    Usage:
+        >>> Numbers = enum(ONE=1, TWO=2, THREE='three')
+        >>> Numbers.ONE
+        1
+        >>> Numbers.TWO
+        2
+        >>> Numbers.THREE
+        'three'
+
+    :return: Enumerated Object.
+    :rtype: type[Enum]
+    """
     enums = dict(zip(sequential, range(len(sequential))), **named)
     reverse = dict(((v, k) for (k, v) in enums.items()))
     enums["reverse_mapping"] = reverse
@@ -73,7 +88,7 @@ def isstring(arg: Any) -> bool:
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any, delimeters: str = None) -> list[str]:
+def string_or_list(value: Any, delimeters: Union[str,None] = None) -> list[str]:
     """
     Return a list containing value.
 
@@ -84,7 +99,7 @@ def string_or_list(value: Any, delimeters: str = None) -> list[str]:
     :param value: a string, object, list, or tuple
     :type value: str|obj|list|tuple
     :param delimeter: use a delimeter in the string using pipe(|) as an OR for multiple.
-     (Optional) Default no delimeter used. Example: delimeters=',| |;|'
+     (Optional) Default no delimeter used. Example: delimeters=',| |;|' or ',| |\|'
     :type delimeter: str|None
     :return: list
     :rtype: list[str]
@@ -181,7 +196,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
     return socket.gethostname()
 
 
-def set_bool(value: str, default: bool = False):
+def set_bool(value: str, default: bool = False) -> Union[str,bool]:
     """sets bool value when pulling string from os env
 
     Args:

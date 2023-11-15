@@ -1,5 +1,9 @@
 # Releases
 
+## v0.0.6
+
+* Added Base Monitor for dataclass that includes some common methods.
+
 ## v0.0.5
 
 * Added nest dict function.
