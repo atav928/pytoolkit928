@@ -4,6 +4,7 @@
 
 * Added Base Monitor for dataclass that includes some common methods.
 * Added Unit test and set pass to 50%.
+* Added file manipulations.
 
 ## v0.0.5
 
