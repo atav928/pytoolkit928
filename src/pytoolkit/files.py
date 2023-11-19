@@ -1,6 +1,7 @@
 """Files."""
 
 import re
+from typing import Any
 from pathlib import Path
 import platform
 import tempfile
@@ -28,7 +29,7 @@ def read_yaml(filename: Path) -> dict[str, Any]:
     :rtype: dict[str,Any]
     """
     with open(filename, 'r', encoding=ENCODING) as r_yaml:
-        settings = yaml.safe_load(r_yaml)
+        settings: Any = yaml.safe_load(r_yaml)
     return settings
 
 
