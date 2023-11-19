@@ -4,6 +4,7 @@
 from typing import Any, Generator, Hashable, Union
 from collections.abc import MutableMapping
 
+from pathlib import Path
 from dataclasses import dataclass, fields
 import pandas as pd
 
@@ -24,7 +25,7 @@ class BaseMonitor:
         :return: Dataclass
         :rtype: :dataclass: DataModel
         """
-        class_fields = {f.name for f in fields(cls)}
+        class_fields: set[str] = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in dict_.items() if k in class_fields})
 
     @classmethod
@@ -38,10 +39,10 @@ class BaseMonitor:
         :return: Dataclass
         :rtype: :dataclass: DataModel
         """
-        class_fields = {f.name for f in fields(cls)}
+        class_fields: set[str] = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in kwargs.items() if k in class_fields})
 
-    def to_dict(self, extend: bool = True):
+    def to_dict(self, extend: bool = True) -> dict[str, Any]:
         """
         Returns dataclass as dictionary.
 
@@ -105,10 +106,9 @@ def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = '.') -> dict[
     :return: Flattened Dictionary.
     :rtype: MutableMapping
     """
-    [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(orient='records')  # type: ignore
+    [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(  # type: ignore
+        orient='records')  # type: ignore
     return flat_dict
-
-# TODO: fix the nested structure add abiltiy to read in a csv or XCEL to help maniplate proper csv human readable datastructures
 
 
 def _nest_dict_rec(key: str, value: Any, sep: str, out: dict[str, Any]) -> None:
@@ -131,7 +131,31 @@ def nested_dict(_dict: MutableMapping[str, Any], sep: str = '.') -> dict[str, An
     :return: Nested Dictionary.
     :rtype: dict[str, Any]
     """
+    # TODO: fix the nested structure add abiltiy to read in a csv or XCEL to help maniplate proper csv human readable datastructures
     result: dict[str, Any] = {}
     for k, v in _dict.items():
         _nest_dict_rec(k, v, sep, result)
     return result
+
+
+def set_bool(value: Union[str,bool], default: bool = False) -> Union[str,bool]:
+    """
+    Sets bool value when pulling string from os env.
+
+    :param value: The value to evaluate
+    :type value: str
+    :param default: default return bool value, defaults to False
+    :type default: bool, optional
+    :return: String if a path is passed otherwise True|False
+    :rtype: Union[str,bool]
+    """
+    value_bool: Union[bool,str] = default
+    if isinstance(value, bool):
+        value_bool = value
+    elif str(value).lower() in ['true','t','1','yes']:
+        value_bool = True
+    elif str(value).lower() in ['false','f','0','no']:
+        value_bool = False
+    elif Path.exists(Path(str(value))):
+        value_bool = value
+    return value_bool

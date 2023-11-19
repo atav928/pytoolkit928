@@ -1,4 +1,5 @@
-"""mailer"""
+# pylint: disable=dangerous-default-value
+"""Mailer."""
 
 from typing import List, Union
 import smtplib
@@ -19,7 +20,7 @@ def send_mail(smtp_server: str, msg: str = "EMPTY", subject: str = "Python Scrip
               mail_cc: Union[list[str],str] = DEFAULT_CC,
               mail_bcc: Union[list[str],str] = DEFAULT_BCC,
               msg_html: Union[str,None] = None,
-              attachment: Union[str,None] = None, port: int = 25):
+              attachment: Union[str,None] = None, port: int = 25) -> str:
     """Send Mail
 
     :param smtp_server: _description_

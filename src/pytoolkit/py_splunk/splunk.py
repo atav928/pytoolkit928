@@ -16,7 +16,7 @@ def splunk_format(**kwargs: Any) -> str:
     return ','.join(string)
 
 
-# TODO: fix the abilit to send HEC formats in chuncks.
+# TODO: fix the ability to send HEC formats in chuncks.
 def splunk_hec_format(host: str, source: str, sourcetype: str,
                       metrics_list: Union[list[str],None] = None,
                       **kwargs: Any) -> dict[str, Any]:
@@ -33,7 +33,7 @@ def splunk_hec_format(host: str, source: str, sourcetype: str,
     :rtype: dict[str,Any]
     """
     hec_json: dict[str, Any] = {
-        "time": datetime.datetime.now().timestamp(),
+        "time": kwargs.pop("time",datetime.datetime.now().timestamp()),
         "host": host,
         "source": source,
         "sourcetype": sourcetype,
