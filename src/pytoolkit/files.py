@@ -66,7 +66,7 @@ def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> 
 def set_location(location: str, extend_path: Union[str, None] = None, mode: str = "default") -> str:
     """Set default logDir or configuration directory based on mode defined."""
     loc = "var"
-    if bool([re.match(r'(home|homedir)', r) for r in Path(location).parts]):
+    if bool(re.match(r'(home|homedir)', location)):
         loc = "home"
     mode = mode if mode in FILE_UMASK_PERMISSIONS else "default"
     base_dir = {

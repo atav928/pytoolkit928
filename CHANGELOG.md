@@ -1,5 +1,9 @@
 # Releases
 
+## v0.0.8
+
+* __HOTFIX:__ issue with set dir.
+
 ## v0.0.7
 
 * Added file manipulations.
