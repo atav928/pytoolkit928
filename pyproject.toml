@@ -26,6 +26,18 @@ dynamic = ["version", "readme", "dependencies","description"]
 [project.urls]
 homepage = "https://github.com/atav928/pytoolkit"
 
+[project.optional-dependencies]
+test = [
+    "pytest-cov",
+    "pytest",
+    "pytest-mock",
+    "unittest",
+    "dataclasses"
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report html --cov-report term-missing --cov-fail-under 50"
+
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}
 readme = {file = ["README.md"], content-type = "text/markdown"}

@@ -1,12 +1,26 @@
 """Utilities."""
 
 from enum import Enum
+import os
 from pathlib import Path
-from typing import Any, List
+import platform
+import pwd
+import socket
+from typing import Any, List, Union
 import base64
 import re
 
 from pytoolkit.static import ENCODING
+
+
+def os_plat() -> str:
+    """
+    Return OS System.
+
+    :return: darwin, linux, java, windows.
+    :rtype: str
+    """
+    return platform.system().lower()
 
 
 def verify_list(value: Any) -> List[str]:
@@ -20,7 +34,7 @@ def verify_list(value: Any) -> List[str]:
     :rtype: List[str]
     """
     if not isinstance(value, list) and isinstance(value, str):
-        return value.split(',')
+        return value.split(",")
     if isinstance(value, list):
         return value  # type: ignore
     raise ValueError(f"Invalid value {value}")
@@ -28,38 +42,55 @@ def verify_list(value: Any) -> List[str]:
 
 def convert_to_base64(filename: str) -> bytes:
     """
-    Converts a file to a byte string off base64.
+    Convert a file to a byte string off base64.
 
     :param filename: Filename
     :type filename: str
     :return: Encoded File String.
     :rtype: base64
     """
-    with open(filename, 'rb') as file:
+    with open(filename, "rb") as file:
         my_string: bytes = base64.b64decode(file.read())
     return my_string
+
 
 # Enumerator type
 
 
-def enum(*sequential, **named) -> type[Enum]:
+def enum(*sequential: Any, **named: Any) -> type[Enum]:
+    """
+    Support for converting the values back to names can be added.
+
+    Usage:
+        >>> Numbers = enum(ONE=1, TWO=2, THREE='three')
+        >>> Numbers.ONE
+        1
+        >>> Numbers.TWO
+        2
+        >>> Numbers.THREE
+        'three'
+
+    :return: Enumerated Object.
+    :rtype: type[Enum]
+    """
     enums = dict(zip(sequential, range(len(sequential))), **named)
     reverse = dict(((v, k) for (k, v) in enums.items()))
     enums["reverse_mapping"] = reverse
     return type("Enum", (), enums)
 
 
-def isstring(arg):
+def isstring(arg: Any) -> bool:
     try:
         return isinstance(arg, basestring)
     except NameError:
-        return isinstance(arg, str) or isinstance(arg, bytes)
+        return isinstance(arg, (str, bytes))
+
 
 # Convenience methods used internally by module
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any, delimeters: str=None) -> list[str]:
+def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]:
     """
     Return a list containing value.
 
@@ -70,7 +101,7 @@ def string_or_list(value: Any, delimeters: str=None) -> list[str]:
     :param value: a string, object, list, or tuple
     :type value: str|obj|list|tuple
     :param delimeter: use a delimeter in the string using pipe(|) as an OR for multiple.
-     (Optional) Default no delimeter used. Example: delimeters=',| |;|'
+     (Optional) Default no delimeter used. Example: delimeters=',| |;|' or ',| |\|'
     :type delimeter: str|None
     :return: list
     :rtype: list[str]
@@ -84,8 +115,16 @@ def string_or_list(value: Any, delimeters: str=None) -> list[str]:
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return re.split(delimeters,value,flags=re.IGNORECASE) if delimeters else [value]
-    return (list(value) if "__iter__" in dir(value) else [value,])
+        return (
+            re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
+        )
+    return (
+        list(value)
+        if "__iter__" in dir(value)
+        else [
+            value,
+        ]
+    )
 
 
 def reformat_exception(error: Exception) -> str:
@@ -100,8 +139,8 @@ def reformat_exception(error: Exception) -> str:
     resp: str = f"{type(error).__name__}: {str(error)}" if error else ""
     # Replacing [ ] with list() due to issues with reading that format with some systems.
     resp = re.sub(r"\'", "", resp)
-    resp = re.sub(r'\[', 'list(', resp)
-    resp = re.sub(r"\]", ')', resp)
+    resp = re.sub(r"\[", "list(", resp)
+    resp = re.sub(r"\]", ")", resp)
     return resp
 
 
@@ -115,7 +154,7 @@ def return_filelines(filename: str) -> list[str]:
     :rtype: list[str]
     """
     filelines: list[str] = []
-    with open(filename, 'r', encoding=ENCODING) as fil:
+    with open(filename, "r", encoding=ENCODING) as fil:
         filelines = fil.readlines()
     return filelines
 
@@ -133,3 +172,57 @@ def check_file(filename: str) -> str:
     if not file.exists():
         raise FileExistsError(f"Filename does not exist: {str(filename)}")
     return filename
+
+
+def return_username(log: Any = None) -> Union[str, None]:
+    """
+    Return Username Information.
+
+    :param log: logger, defaults to None
+    :type log: Logger, optional
+    :return: username
+    :rtype: Union[str,None]
+    """
+    try:
+        return pwd.getpwuid(os.getuid())[0]
+    except Exception as err:
+        error: str = reformat_exception(err)
+        if log:
+            log.error(f'msg="Unable to get username"|{error=}')
+    return None
+
+
+def return_hostinfo(fqdn: bool = True) -> str:
+    """
+    Return Hostname information on system.
+
+    :param fqdn: Retun FQDN or Hostname, defaults to True
+    :type fqdn: bool, optional
+    :return: System Hostname/FQDN
+    :rtype: str
+    """
+    if fqdn:
+        return socket.getfqdn()
+    return socket.gethostname()
+
+
+def set_bool(value: str, default: bool = False) -> Union[str, bool]:
+    """sets bool value when pulling string from os env
+
+    Args:
+        value (str|bool, Required): the value to evaluate
+        default (bool): default return bool value. Default False
+
+    Returns:
+        (str|bool): String if certificate path is passed otherwise True|False
+    """
+    value_bool = default
+    if isinstance(value, bool):
+        value_bool = value
+    elif str(value).lower() == "true":
+        value_bool = True
+    elif str(value).lower() == "false":
+        value_bool = False
+    elif Path.exists(Path(value)):
+        value_bool = value
+    return value_bool
