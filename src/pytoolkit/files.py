@@ -15,7 +15,7 @@ from pytoolkit.static import ENCODING
 FILE_UMASK_PERMISSIONS = {
     "default": 0o40775,  # umask 002 rw-rw-r- rwxrwx-r
     "restrictive": 0o40770,  # umask 037 rw-r--- rwxr---
-    "root": 0o40755  # umask 022 rw-r-r- rwxr-xr-x
+    "root": 0o40755,  # umask 022 rw-r-r- rwxr-xr-x
 }
 
 
@@ -28,7 +28,7 @@ def read_yaml(filename: Path) -> dict[str, Any]:
     :return: Yaml Configurations
     :rtype: dict[str,Any]
     """
-    with open(filename, 'r', encoding=ENCODING) as r_yaml:
+    with open(filename, "r", encoding=ENCODING) as r_yaml:
         settings: Any = yaml.safe_load(r_yaml)
     return settings
 
@@ -47,32 +47,36 @@ def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> 
     """
     directory: dict[str, Path] = {
         "darwin": Path.joinpath(Path.home() / "Library/Logs"),
-        "linux": Path("/var/log")
+        "linux": Path("/var/log"),
     }
     plat: str = platform.system()
     try:
-        path = Path(f"{str(directory[plat.lower()])}/{extend_path}") if extend_path else Path(
-            str(directory[plat.lower()]))
+        path = (
+            Path(f"{str(directory[plat.lower()])}/{extend_path}")
+            if extend_path
+            else Path(str(directory[plat.lower()]))
+        )
         mkdir(path=path, mode=mode)
         return str(path)
     except KeyError:
-        path = Path(
-            f"{str(tempfile.gettempdir())}/{extend_path}") if extend_path else Path(
-                tempfile.gettempdir())
+        path = (
+            Path(f"{str(tempfile.gettempdir())}/{extend_path}")
+            if extend_path
+            else Path(tempfile.gettempdir())
+        )
         mkdir(path=path, mode=mode)
         return str(path)
 
 
-def set_location(location: str, extend_path: Union[str, None] = None, mode: str = "default") -> str:
+def set_location(
+    location: str, extend_path: Union[str, None] = None, mode: str = "default"
+) -> str:
     """Set default logDir or configuration directory based on mode defined."""
     loc = "var"
-    if bool(re.match(r'(home|homedir)', location)):
+    if bool(re.match(r"(home|homedir)", location)):
         loc = "home"
     mode = mode if mode in FILE_UMASK_PERMISSIONS else "default"
-    base_dir = {
-        "home": set_homedir,
-        "var": get_var_dir
-    }
+    base_dir = {"home": set_homedir, "var": get_var_dir}
     return base_dir[loc](extend_path=extend_path, mode=mode)
 
 
@@ -94,7 +98,7 @@ def set_homedir(extend_path: Union[str, None] = None, mode: str = "default") -> 
 
 def mkdir(path: Path, mode: str = "default"):
     """Makes Dir based on permissions passed."""
-    #for parent in reversed(path.parents):
+    # for parent in reversed(path.parents):
     path.mkdir(mode=FILE_UMASK_PERMISSIONS[mode], parents=True, exist_ok=True)
 
 
@@ -105,4 +109,4 @@ def get_home() -> str:
 
 def with_suffix(logName: str) -> str:
     """Add suffix to logname."""
-    return str(Path(logName).with_suffix('.log'))
+    return str(Path(logName).with_suffix(".log"))

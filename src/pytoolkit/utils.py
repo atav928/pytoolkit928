@@ -34,7 +34,7 @@ def verify_list(value: Any) -> List[str]:
     :rtype: List[str]
     """
     if not isinstance(value, list) and isinstance(value, str):
-        return value.split(',')
+        return value.split(",")
     if isinstance(value, list):
         return value  # type: ignore
     raise ValueError(f"Invalid value {value}")
@@ -49,14 +49,15 @@ def convert_to_base64(filename: str) -> bytes:
     :return: Encoded File String.
     :rtype: base64
     """
-    with open(filename, 'rb') as file:
+    with open(filename, "rb") as file:
         my_string: bytes = base64.b64decode(file.read())
     return my_string
+
 
 # Enumerator type
 
 
-def enum(*sequential:Any, **named:Any) -> type[Enum]:
+def enum(*sequential: Any, **named: Any) -> type[Enum]:
     """
     Support for converting the values back to names can be added.
 
@@ -84,11 +85,12 @@ def isstring(arg: Any) -> bool:
     except NameError:
         return isinstance(arg, (str, bytes))
 
+
 # Convenience methods used internally by module
 # Do not use these methods outside the module
 
 
-def string_or_list(value: Any, delimeters: Union[str,None] = None) -> list[str]:
+def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]:
     """
     Return a list containing value.
 
@@ -113,8 +115,16 @@ def string_or_list(value: Any, delimeters: Union[str,None] = None) -> list[str]:
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
-    return (list(value) if "__iter__" in dir(value) else [value,])
+        return (
+            re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
+        )
+    return (
+        list(value)
+        if "__iter__" in dir(value)
+        else [
+            value,
+        ]
+    )
 
 
 def reformat_exception(error: Exception) -> str:
@@ -129,8 +139,8 @@ def reformat_exception(error: Exception) -> str:
     resp: str = f"{type(error).__name__}: {str(error)}" if error else ""
     # Replacing [ ] with list() due to issues with reading that format with some systems.
     resp = re.sub(r"\'", "", resp)
-    resp = re.sub(r'\[', 'list(', resp)
-    resp = re.sub(r"\]", ')', resp)
+    resp = re.sub(r"\[", "list(", resp)
+    resp = re.sub(r"\]", ")", resp)
     return resp
 
 
@@ -144,7 +154,7 @@ def return_filelines(filename: str) -> list[str]:
     :rtype: list[str]
     """
     filelines: list[str] = []
-    with open(filename, 'r', encoding=ENCODING) as fil:
+    with open(filename, "r", encoding=ENCODING) as fil:
         filelines = fil.readlines()
     return filelines
 
@@ -178,7 +188,7 @@ def return_username(log: Any = None) -> Union[str, None]:
     except Exception as err:
         error: str = reformat_exception(err)
         if log:
-            log.error(f"msg=\"Unable to get username\"|{error=}")
+            log.error(f'msg="Unable to get username"|{error=}')
     return None
 
 
@@ -196,7 +206,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
     return socket.gethostname()
 
 
-def set_bool(value: str, default: bool = False) -> Union[str,bool]:
+def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     """sets bool value when pulling string from os env
 
     Args:
@@ -209,9 +219,9 @@ def set_bool(value: str, default: bool = False) -> Union[str,bool]:
     value_bool = default
     if isinstance(value, bool):
         value_bool = value
-    elif str(value).lower() == 'true':
+    elif str(value).lower() == "true":
         value_bool = True
-    elif str(value).lower() == 'false':
+    elif str(value).lower() == "false":
         value_bool = False
     elif Path.exists(Path(value)):
         value_bool = value

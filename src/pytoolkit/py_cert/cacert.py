@@ -8,7 +8,7 @@ from pathlib import Path
 import certifi
 
 from pytoolkit.static import ENCODING, PEM_REGEX, TMP_PEM_POSTFIX
-from pytoolkit.utils import (check_file, return_filelines, string_or_list)
+from pytoolkit.utils import check_file, return_filelines, string_or_list
 
 
 def create_custom_cert(certstore: list[str]) -> tuple[str, list[str]]:
@@ -40,7 +40,7 @@ def castore_create_tmp(ca_context: list[str]) -> str:
     temp: str = tempfile.gettempdir()
     file_name: str = f"{uuid.uuid4()}{TMP_PEM_POSTFIX}"
     writeout: Path = Path.joinpath(Path(temp) / file_name)
-    with open(writeout, 'w', encoding=ENCODING) as fil:
+    with open(writeout, "w", encoding=ENCODING) as fil:
         fil.writelines(ca_context)
     return str(writeout)
 
