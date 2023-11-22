@@ -6,13 +6,25 @@ from typing import Any, Optional, Union, Hashable
 
 from dataclasses import dataclass
 
-from pytoolkit.utilities import nested_dict, flatten_dict, flatten_dictionary, BaseMonitor
+from pytoolkit.utilities import (
+    nested_dict,
+    flatten_dict,
+    flatten_dictionary,
+    BaseMonitor,
+)
 from pytoolkit.static import NONETYPE
 
 test_nest_dict: dict[str, Union[str, dict[str, str]]] = {
-    "key1": "value", "key2": "value2", "metadata": {"key1": "meta_value1", "key2": "meta_value2"}}
-test_flat_dict: dict[str, str] = {'key1': 'value', 'key2': 'value2',
-                                  'metadata.key1': 'meta_value1', 'metadata.key2': 'meta_value2'}
+    "key1": "value",
+    "key2": "value2",
+    "metadata": {"key1": "meta_value1", "key2": "meta_value2"},
+}
+test_flat_dict: dict[str, str] = {
+    "key1": "value",
+    "key2": "value2",
+    "metadata.key1": "meta_value1",
+    "metadata.key2": "meta_value2",
+}
 
 test_dataclass = {"sample": "sample_text", "integer": 100}
 test_dataclass_opt = {**test_dataclass, **{"novalue": "emptyvalue"}}
@@ -35,7 +47,9 @@ class TestDictionaries(unittest.TestCase):
         self.assertIsInstance(converted["metadata"], dict)
 
     def test_flat(self) -> None:
-        print("Running tests against Converting a Nested dictionary to a Flattened Dict.")
+        print(
+            "Running tests against Converting a Nested dictionary to a Flattened Dict."
+        )
         converted: dict[str, Any] = flatten_dict(test_nest_dict)
         for v in converted.values():
             self.assertIsInstance(v, str)
@@ -57,5 +71,5 @@ class TestDictionaries(unittest.TestCase):
         self.assertNotIn("novalue", base_dc.to_dict().keys())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

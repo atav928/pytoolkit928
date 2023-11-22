@@ -17,5 +17,6 @@ class TestReadYaml(unittest.TestCase):
         result = read_yaml("some_file.yaml")
         self.assertEqual("data", result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
