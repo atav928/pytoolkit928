@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import mock_open
 from unittest import mock
 
-from pytoolkit.files import read_yaml
+from pytoolkit.files import read_yaml, get_var_dir
 
 
 class TestReadYaml(unittest.TestCase):
