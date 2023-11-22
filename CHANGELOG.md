@@ -1,5 +1,13 @@
 # Releases
 
+## v0.0.8
+
+* __HOTFIX:__ issue with set dir.
+
+## v0.0.7
+
+* Added file manipulations.
+
 ## v0.0.6
 
 * Added Base Monitor for dataclass that includes some common methods.

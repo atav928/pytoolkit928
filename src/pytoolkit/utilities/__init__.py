@@ -4,6 +4,7 @@
 from typing import Any, Generator, Hashable, Union
 from collections.abc import MutableMapping
 
+from pathlib import Path
 from dataclasses import dataclass, fields
 import pandas as pd
 
@@ -13,6 +14,7 @@ from pytoolkit.static import NONETYPE
 @dataclass
 class BaseMonitor:
     """Base Dataclass Methods."""
+
     @classmethod
     def create_from_dict(cls, dict_: dict[str, Any]):
         """
@@ -24,7 +26,7 @@ class BaseMonitor:
         :return: Dataclass
         :rtype: :dataclass: DataModel
         """
-        class_fields = {f.name for f in fields(cls)}
+        class_fields: set[str] = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in dict_.items() if k in class_fields})
 
     @classmethod
@@ -38,10 +40,10 @@ class BaseMonitor:
         :return: Dataclass
         :rtype: :dataclass: DataModel
         """
-        class_fields = {f.name for f in fields(cls)}
+        class_fields: set[str] = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in kwargs.items() if k in class_fields})
 
-    def to_dict(self, extend: bool = True):
+    def to_dict(self, extend: bool = True) -> dict[str, Any]:
         """
         Returns dataclass as dictionary.
 
@@ -50,29 +52,43 @@ class BaseMonitor:
         :return: dataclass dictionary
         :rtype: dict[str, Any]
         """
-        return {key: value for key, value in self.__dict__.items() if value is not NONETYPE}
+        return {
+            key: value for key, value in self.__dict__.items() if value is not NONETYPE
+        }
 
 
-def _flatten_dict_gen(_d: MutableMapping[str, Any], parent_key: str,
-                      sep: str, extended_label: bool,
-                      skip_item: list[str]) -> Generator[tuple[str, Any], Any, None]:
+def _flatten_dict_gen(
+    _d: MutableMapping[str, Any],
+    parent_key: str,
+    sep: str,
+    extended_label: bool,
+    skip_item: list[str],
+) -> Generator[tuple[str, Any], Any, None]:
     for k, v in _d.items():
         new_key: str = k
         if extended_label:
-            new_key: str = parent_key + sep + \
-                k if (parent_key and k not in skip_item) else k  # type: ignore
+            new_key: str = (
+                parent_key + sep + k if (parent_key and k not in skip_item) else k
+            )  # type: ignore
         if isinstance(v, MutableMapping):
-            yield from flatten_dict(v,  # type: ignore
-                                    new_key, extended_label=extended_label,
-                                    skip_item=skip_item,
-                                    sep=sep).items()
+            yield from flatten_dict(
+                v,  # type: ignore
+                new_key,
+                extended_label=extended_label,
+                skip_item=skip_item,
+                sep=sep,
+            ).items()
         else:
             yield new_key, v
 
 
-def flatten_dict(_dict: MutableMapping[str, Any], parent_key: str = "",
-                 sep: str = ".", extended_label: bool = True,
-                 skip_item: Union[list[str], None] = None) -> dict[str, Any]:
+def flatten_dict(
+    _dict: MutableMapping[str, Any],
+    parent_key: str = "",
+    sep: str = ".",
+    extended_label: bool = True,
+    skip_item: Union[list[str], None] = None,
+) -> dict[str, Any]:
     """
     Flatten out a dictionary with nested values.
 
@@ -94,7 +110,9 @@ def flatten_dict(_dict: MutableMapping[str, Any], parent_key: str = "",
     return dict(_flatten_dict_gen(_dict, parent_key, sep, extended_label, skip_item))
 
 
-def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = '.') -> dict[Hashable, Any]:
+def flatten_dictionary(
+    _dict: MutableMapping[Any, Any], sep: str = "."
+) -> dict[Hashable, Any]:
     """
     Flatten a dictionary via pandas normalizer.
 
@@ -105,10 +123,10 @@ def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = '.') -> dict[
     :return: Flattened Dictionary.
     :rtype: MutableMapping
     """
-    [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(orient='records')  # type: ignore
+    [flat_dict] = pd.json_normalize(_dict, sep=sep).to_dict(  # type: ignore
+        orient="records"
+    )  # type: ignore
     return flat_dict
-
-# TODO: fix the nested structure add abiltiy to read in a csv or XCEL to help maniplate proper csv human readable datastructures
 
 
 def _nest_dict_rec(key: str, value: Any, sep: str, out: dict[str, Any]) -> None:
@@ -120,7 +138,7 @@ def _nest_dict_rec(key: str, value: Any, sep: str, out: dict[str, Any]) -> None:
         out[key] = value
 
 
-def nested_dict(_dict: MutableMapping[str, Any], sep: str = '.') -> dict[str, Any]:
+def nested_dict(_dict: MutableMapping[str, Any], sep: str = ".") -> dict[str, Any]:
     """
     Transform a Flattened Dictionary into a Nested Dictionary.
 
@@ -131,7 +149,31 @@ def nested_dict(_dict: MutableMapping[str, Any], sep: str = '.') -> dict[str, An
     :return: Nested Dictionary.
     :rtype: dict[str, Any]
     """
+    # TODO: fix the nested structure add abiltiy to read in a csv or XCEL to help maniplate proper csv human readable datastructures
     result: dict[str, Any] = {}
     for k, v in _dict.items():
         _nest_dict_rec(k, v, sep, result)
     return result
+
+
+def set_bool(value: Union[str, bool], default: bool = False) -> Union[str, bool]:
+    """
+    Sets bool value when pulling string from os env.
+
+    :param value: The value to evaluate
+    :type value: str
+    :param default: default return bool value, defaults to False
+    :type default: bool, optional
+    :return: String if a path is passed otherwise True|False
+    :rtype: Union[str,bool]
+    """
+    value_bool: Union[bool, str] = default
+    if isinstance(value, bool):
+        value_bool = value
+    elif str(value).lower() in ["true", "t", "1", "yes"]:
+        value_bool = True
+    elif str(value).lower() in ["false", "f", "0", "no"]:
+        value_bool = False
+    elif Path.exists(Path(str(value))):
+        value_bool = value
+    return value_bool

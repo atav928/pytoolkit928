@@ -1,12 +1,23 @@
 """Files."""
 
+import re
+from typing import Any
 from pathlib import Path
 import platform
 import tempfile
 from typing import Any, Union
+
 import yaml
 
 from pytoolkit.static import ENCODING
+
+# See https://www.linuxtrainingacademy.com/all-umasks/
+FILE_UMASK_PERMISSIONS = {
+    "default": 0o40775,  # umask 002 rw-rw-r- rwxrwx-r
+    "restrictive": 0o40770,  # umask 037 rw-r--- rwxr---
+    "root": 0o40755,  # umask 022 rw-r-r- rwxr-xr-x
+}
+
 
 def read_yaml(filename: Path) -> dict[str, Any]:
     """
@@ -17,13 +28,16 @@ def read_yaml(filename: Path) -> dict[str, Any]:
     :return: Yaml Configurations
     :rtype: dict[str,Any]
     """
-    with open(filename, 'r', encoding=ENCODING) as r_yaml:
-        settings = yaml.safe_load(r_yaml)
+    with open(filename, "r", encoding=ENCODING) as r_yaml:
+        settings: Any = yaml.safe_load(r_yaml)
     return settings
 
-def get_log_dir(extend_path: Union[str,None] = None) -> str:
+
+def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> str:
     """
-    Get default log directory depending on OS. Extend to application path if path supplied.
+    Get default var directory depending on OS. Extend to application path if path supplied.
+     Allows for user to create a directory strcture where reports or logs can be stored. Using
+     a variable directory or extend a path in a users home directory.
 
     :param extend_path: Extends the system default location;
      creates a new app directory, defaults to None
@@ -33,35 +47,66 @@ def get_log_dir(extend_path: Union[str,None] = None) -> str:
     """
     directory: dict[str, Path] = {
         "darwin": Path.joinpath(Path.home() / "Library/Logs"),
-        "linux": Path("/var/log")
+        "linux": Path("/var/log"),
     }
     plat: str = platform.system()
     try:
-        if extend_path:
-            return f"{str(directory[plat.lower()])}/{extend_path}"
-        return str(directory[plat.lower()])
+        path = (
+            Path(f"{str(directory[plat.lower()])}/{extend_path}")
+            if extend_path
+            else Path(str(directory[plat.lower()]))
+        )
+        mkdir(path=path, mode=mode)
+        return str(path)
     except KeyError:
-        if extend_path:
-            return f"{str(tempfile.gettempdir())}/{extend_path}"
-        return tempfile.gettempdir()
+        path = (
+            Path(f"{str(tempfile.gettempdir())}/{extend_path}")
+            if extend_path
+            else Path(tempfile.gettempdir())
+        )
+        mkdir(path=path, mode=mode)
+        return str(path)
 
 
-def set_logdir(location: str = "home", extend: str = "") -> str:
-    """Set default logDir if not provided."""
-    if location.lower() == "home":
-        return get_log_home()
-    if location.lower() == "default":
-        return get_log_dir()
-    if location.lower() == "extend":
-        return get_log_dir(extend_path=extend)
-    raise ValueError(f"Unknown location type {location}")
+def set_location(
+    location: str, extend_path: Union[str, None] = None, mode: str = "default"
+) -> str:
+    """Set default logDir or configuration directory based on mode defined."""
+    loc = "var"
+    if bool(re.match(r"(home|homedir)", location)):
+        loc = "home"
+    mode = mode if mode in FILE_UMASK_PERMISSIONS else "default"
+    base_dir = {"home": set_homedir, "var": get_var_dir}
+    return base_dir[loc](extend_path=extend_path, mode=mode)
 
 
-def get_log_home() -> str:
+def set_homedir(extend_path: Union[str, None] = None, mode: str = "default") -> str:
+    """
+    Return the users home dir and can extend if using a subdirctory. Use `mode` to restrict permissions.
+
+    :param extend_path: _description_, defaults to None
+    :type extend_path: Union[str,None], optional
+    :param mode: _description_, defaults to "default"
+    :type mode: str, optional
+    :return: _description_
+    :rtype: str
+    """
+    path = Path(Path.home() / extend_path) if extend_path else Path.home()
+    mkdir(path=path, mode=mode)
+    return str(path)
+
+
+def mkdir(path: Path, mode: str = "default"):
+    """Makes Dir based on permissions passed."""
+    # for parent in reversed(path.parents):
+    path.mkdir(mode=FILE_UMASK_PERMISSIONS[mode], parents=True, exist_ok=True)
+
+
+def get_home() -> str:
     """Return current users `home` direcotry."""
     return str(Path.home())
 
 
 def with_suffix(logName: str) -> str:
     """Add suffix to logname."""
-    return str(Path(logName).with_suffix('.log'))
+    return str(Path(logName).with_suffix(".log"))
