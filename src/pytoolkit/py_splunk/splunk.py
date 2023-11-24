@@ -17,7 +17,7 @@ def splunk_format(**kwargs: Any) -> str:
     return ",".join(string)
 
 
-# TODO: fix the ability to send HEC formats in chuncks.
+# TODO: fix the ability to send HEC formats in chuncks. ippoad
 def splunk_hec_format(
     host: str,
     source: str,

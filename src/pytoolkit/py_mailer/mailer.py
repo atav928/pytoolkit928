@@ -115,3 +115,6 @@ def send_mail(
         return f"SMTP Communication Error: {str(err)}"
     except Exception:
         return "SMTP Unknown Error"
+        
+# TODO: Create an encoded function to allow encoded/embeded attachements
+# TODO: Add basic templates that can be used for HTML notifications based off Jinja2 examples
