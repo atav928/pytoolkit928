@@ -31,7 +31,7 @@ class TestSplunk(unittest.TestCase):
     def test_hec(self) -> None:
         self.assertIsInstance(sample_data, dict)
         print("Reformating sample data to HEC Splunk format.")
-        hec = splunk.splunk_hec_format(
+        hec: dict[str, Any] = splunk.splunk_hec_format(
             host="sample.com",
             source="source",
             sourcetype="source_type",
@@ -42,7 +42,7 @@ class TestSplunk(unittest.TestCase):
         self.assertIs(hec["events"]["index"], "some_index")
 
     def test_splunk_form(self) -> None:
-        string = splunk.splunk_format(**sample_data)
+        string: str = splunk.splunk_format(**sample_data)
         print("Converting Splunk Data Dictionary to a string format.")
         self.assertIsInstance(string, str)
 

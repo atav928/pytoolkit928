@@ -26,8 +26,8 @@ test_flat_dict: dict[str, str] = {
     "metadata.key2": "meta_value2",
 }
 
-test_dataclass = {"sample": "sample_text", "integer": 100}
-test_dataclass_opt = {**test_dataclass, **{"novalue": "emptyvalue"}}
+test_dataclass: Union[dict[str, str], int]] = {"sample": "sample_text", "integer": 100}
+test_dataclass_opt: Union[dict[str, str], int]] = {**test_dataclass, **{"novalue": "emptyvalue"}}
 
 
 @dataclass

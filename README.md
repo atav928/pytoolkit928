@@ -20,6 +20,47 @@ __Example:__
 ['string1', 'string2', 'string3', 'string4']
 ```
 
+### Dataclass Base
+
+Used for basic extended functionality for dataclass declerations. Includes the ability to create a dataclass from a ``dictionary`` or from ``**kwargs``. Also, includes a conversion from ``Dataclass`` to a Python ``dictionary``.
+
+__Usage:__
+
+```python
+from typing import Optional
+from dataclasses import dataclass
+
+from pytoolkit.utilities import BaseMonitor, NONETYPE
+
+@dataclass
+class Sample(BaseMonitor):
+    key1: str
+    key2: str
+    key3: int
+    key5: Optional[str] = NONETYPE
+
+# create a sample module
+_dict = {"key1": "value1", "key2": "value2", "key3": 3}
+
+sample1 = Sample.create_from_dict(_dict)
+sample2 = Sample.create_from_kwargs(**_dict)
+
+print(sample1)
+print(sample2)
+print(sample1.to_dict())
+```
+
+__OUTPUT:__
+
+```bash
+>>> print(sample1)
+Sample(key1='value1', key2='value2', key3=3, key5=<object object at 0x10c8e8b70>)
+>>> print(sample2)
+Sample(key1='value1', key2='value2', key3=3, key5=<object object at 0x10c8e8b70>)
+>>> print(sample1.to_dict())
+{'key1': 'value1', 'key2': 'value2', 'key3': 3}
+```
+
 ### Maniuplating Dictionaries
 
 __Flatten a Dictionary:__
