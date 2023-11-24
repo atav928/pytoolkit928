@@ -28,6 +28,7 @@ def read_yaml(filename: Path) -> dict[str, Any]:
     :return: Yaml Configurations
     :rtype: dict[str,Any]
     """
+    check_file(filename=str(filename))
     with open(filename, "r", encoding=ENCODING) as r_yaml:
         settings: Any = yaml.safe_load(r_yaml)
     return settings
@@ -82,7 +83,8 @@ def set_location(
 
 def set_homedir(extend_path: Union[str, None] = None, mode: str = "default") -> str:
     """
-    Return the users home dir and can extend if using a subdirctory. Use `mode` to restrict permissions.
+    Return the users home dir and can extend if using a subdirctory.
+     Use `mode` to restrict permissions.
 
     :param extend_path: _description_, defaults to None
     :type extend_path: Union[str,None], optional
@@ -110,3 +112,14 @@ def get_home() -> str:
 def with_suffix(logName: str) -> str:
     """Add suffix to logname."""
     return str(Path(logName).with_suffix(".log"))
+
+def check_file(filename: str) -> None:
+    """
+    Checks if a file exists.
+
+    :param filename: _description_
+    :type filename: str
+    :raises ValueError: _description_
+    """
+    if not Path(filename).is_file():
+        raise ValueError(f"Not a file {filename}")
