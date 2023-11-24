@@ -1,5 +1,13 @@
 # Releases
 
+## v0.0.9
+
+* Cleaned up Base Dataclass module.
+* Added additional file checks.
+* Added code checks.
+* Aded Snyk validation for vulnerabilities.
+* Added pipelines for auto testing.
+
 ## v0.0.8
 
 * __HOTFIX:__ issue with set dir.

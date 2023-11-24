@@ -16,18 +16,18 @@ class BaseMonitor:
     """Base Dataclass Methods."""
 
     @classmethod
-    def create_from_dict(cls, dict_: dict[str, Any]):
+    def create_from_dict(cls, _dict: dict[str, Any]):
         """
         Class Method that returns dataclass using a
          dictionary and strips invalid params.
 
-        :param dict_: _description_
-        :type dict_: _type_
+        :param _dict: Dictionary of Values
+        :type _dict: dict[str, Any]
         :return: Dataclass
         :rtype: :dataclass: DataModel
         """
         class_fields: set[str] = {f.name for f in fields(cls)}
-        return cls(**{k: v for k, v in dict_.items() if k in class_fields})
+        return cls(**{k: v for k, v in _dict.items() if k in class_fields})
 
     @classmethod
     def create_from_kwargs(cls, **kwargs: Any):
@@ -52,9 +52,9 @@ class BaseMonitor:
         :return: dataclass dictionary
         :rtype: dict[str, Any]
         """
-        return {
-            key: value for key, value in self.__dict__.items() if value is not NONETYPE
-        }
+        if not extend:
+            return dict(self.__dict__.items())
+        return {k: v for k, v in self.__dict__.items() if v is not NONETYPE}
 
 
 def _flatten_dict_gen(
