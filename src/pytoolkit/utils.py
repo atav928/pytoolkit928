@@ -11,8 +11,6 @@ from typing import Any, List, Union
 import base64
 import re
 
-import ipaddress
-
 from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4
 
 
