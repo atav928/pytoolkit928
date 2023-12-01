@@ -32,11 +32,12 @@ test = [
     "pytest",
     "pytest-mock",
     "unittest",
-    "dataclasses"
+    "dataclasses",
+    "six"
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report html --cov-report term-missing --cov-fail-under 50"
+addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 50"
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}

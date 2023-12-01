@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Global Static Vars."""
 
 from typing import cast
@@ -13,3 +14,6 @@ TMP_PEM_POSTFIX = "_pytookit.pem"
 PEM_REGEX = (
     r".*[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}_pytoolkit\.pem$"
 )
+
+RE_DOMAIN = r".*\..*\.[com|net|gov]$"
+RE_IP4 = r"^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"

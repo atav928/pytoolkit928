@@ -1,9 +1,32 @@
 # pylint: disable=missing-function-docstring,missing-class-docstring
 """Test Utilities."""
 
+from enum import Enum
+import functools
+import re
 import unittest
+from unittest import mock
 
 from pytoolkit import utils
+from pytoolkit import static
+
+
+def patch_getfqdn(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return "server01.b100.example.com"
+
+    return wrapper
+
+
+def test_getfqdn():
+    # Create a mock object for the socket module
+    with mock.patch("socket.getfqdn") as mock_getfqdn:
+        # Set the return value of mock_getfqdn
+        mock_getfqdn.return_value = "server01.b100.example.com"
+        result = utils.return_hostinfo(fqdn=True)
+        assert result == "server01.b100.example.com"
 
 
 class TestStringMethods(unittest.TestCase):
@@ -41,7 +64,7 @@ class TestStringMethods(unittest.TestCase):
             "String was converted to a list",
         )
         self.assertEqual(
-            len(utils.string_or_list(multistring, ",| |\|")),
+            len(utils.string_or_list(multistring, r"\,|\ |\|")),
             9,
             "Split out mutilple string to 10 values.",
         )
@@ -67,10 +90,16 @@ class TestStringMethods(unittest.TestCase):
 
     def test_enum(self) -> None:
         print("Testing Enumaration Function.")
-        Numbers = utils.enum(ONE=1, TWO=2, THREE="three")
+        Numbers: type[Enum] = utils.enum(ONE=1, TWO=2, THREE="three")
         self.assertEqual(Numbers.ONE, 1)
         self.assertEqual(Numbers.TWO, 2)
         self.assertEqual(Numbers.THREE, "three")
+
+    @patch_getfqdn
+    def test_hostinfo_host(self):
+        result = utils.return_hostinfo(fqdn=False)
+        print(result)
+        self.assertIsNone(re.match(static.RE_DOMAIN, result))
 
 
 if __name__ == "__main__":
