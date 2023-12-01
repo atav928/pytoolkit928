@@ -1,11 +1,11 @@
 """Files."""
 
 import re
-from typing import Any
+import json
+from typing import Any,Union
 from pathlib import Path
 import platform
 import tempfile
-from typing import Any, Union
 
 import yaml
 
@@ -18,6 +18,12 @@ FILE_UMASK_PERMISSIONS = {
     "root": 0o40755,  # umask 022 rw-r-r- rwxr-xr-x
 }
 
+class BytesDump(json.JSONEnocder):
+    """Resovlve error with byte present in Dict."""
+    def default(self, obj):
+        if isinstance(obj, bytes):
+            return obj.decode()
+        return json.JSONEncoder.default(self,obj)
 
 def read_yaml(filename: Path) -> dict[str, Any]:
     """
@@ -33,6 +39,9 @@ def read_yaml(filename: Path) -> dict[str, Any]:
         settings: Any = yaml.safe_load(r_yaml)
     return settings
 
+def get_tempdir() -> str:
+    """Returns tempdir"""
+    return tempfile.gettempdir()
 
 def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> str:
     """
