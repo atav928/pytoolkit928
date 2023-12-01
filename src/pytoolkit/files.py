@@ -1,11 +1,12 @@
+# pylint: disable=invalid-name
 """Files."""
 
 import re
-from typing import Any
+from json import JSONEncoder
+from typing import Any, Union
 from pathlib import Path
 import platform
 import tempfile
-from typing import Any, Union
 
 import yaml
 
@@ -17,6 +18,16 @@ FILE_UMASK_PERMISSIONS = {
     "restrictive": 0o40770,  # umask 037 rw-r--- rwxr---
     "root": 0o40755,  # umask 022 rw-r-r- rwxr-xr-x
 }
+
+
+class BytesDump(JSONEnocder):
+    """Resovlve error with byte present in Dict."""
+
+    def default(self, obj: Any) -> Union[str, Any]:
+        """Resolve error with byte in Dict."""
+        if isinstance(obj, bytes):
+            return obj.decode()
+        return JSONEncoder.default(self, obj)
 
 
 def read_yaml(filename: Path) -> dict[str, Any]:
@@ -32,6 +43,11 @@ def read_yaml(filename: Path) -> dict[str, Any]:
     with open(filename, "r", encoding=ENCODING) as r_yaml:
         settings: Any = yaml.safe_load(r_yaml)
     return settings
+
+
+def get_tempdir() -> str:
+    """Returns tempdir"""
+    return tempfile.gettempdir()
 
 
 def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> str:
@@ -98,7 +114,7 @@ def set_homedir(extend_path: Union[str, None] = None, mode: str = "default") -> 
     return str(path)
 
 
-def mkdir(path: Path, mode: str = "default"):
+def mkdir(path: Path, mode: str = "default") -> None:
     """Makes Dir based on permissions passed."""
     # for parent in reversed(path.parents):
     path.mkdir(mode=FILE_UMASK_PERMISSIONS[mode], parents=True, exist_ok=True)
@@ -112,6 +128,7 @@ def get_home() -> str:
 def with_suffix(logName: str) -> str:
     """Add suffix to logname."""
     return str(Path(logName).with_suffix(".log"))
+
 
 def check_file(filename: str) -> None:
     """

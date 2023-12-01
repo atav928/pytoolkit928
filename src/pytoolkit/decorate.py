@@ -1,6 +1,7 @@
 # pylint: disable=too-many-arguments
 """Decorators."""
 
+from typing import Union, Any, Callable
 from functools import partial
 import functools
 from inspect import isfunction
@@ -12,15 +13,15 @@ from pytoolkit.utils import reformat_exception
 
 
 def __retry_interval(
-    func,
+    func: Callable[Any],
     exceptions=Exception,
-    tries=-1,
-    delay=0,
-    max_delay=None,
-    backoff=1,
-    jitter=0,
-    logger=None,
-):
+    tries: int = -1,
+    delay: int = 0,
+    max_delay: Union[int, None] = None,
+    backoff: int = 1,
+    jitter: int = 0,
+    logger: Any = None,
+) -> Union[Any, None]:
     """
     Executes a function and retries it if it failed.
 
@@ -69,13 +70,13 @@ def __retry_interval(
 
 def retry(
     exceptions=Exception,
-    tries=-1,
-    delay=0,
-    max_delay=None,
-    backoff=1,
-    jitter=0,
-    logger=None,
-):
+    tries: int = -1,
+    delay: int = 0,
+    max_delay: Union[int, None] = None,
+    backoff: int = 1,
+    jitter: int = 0,
+    logger: Any = None,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Returns a retry decorator.
 
