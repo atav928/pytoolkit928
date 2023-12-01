@@ -10,6 +10,7 @@ sample_headers: dict[str, int] = {"test": 1}
 @dataclass
 class Response:
     """Mock Response."""
+
     body: str
     status: int = field(default=200)
     headers: dict[Any, Any] = field(default_factory=dict)

@@ -170,9 +170,9 @@ def set_bool(value: Union[str, bool], default: bool = False) -> Union[str, bool]
     value_bool: Union[bool, str] = default
     if isinstance(value, bool):
         value_bool = value
-    elif str(value).lower() in ["true", "t", "1", "yes"]:
+    elif str(value).lower() in ["true", "t", "1", "yes", "y"]:
         value_bool = True
-    elif str(value).lower() in ["false", "f", "0", "no"]:
+    elif str(value).lower() in ["false", "f", "0", "no", "n"]:
         value_bool = False
     elif Path.exists(Path(str(value))):
         value_bool = value

@@ -7,6 +7,7 @@
 * Added code checks.
 * Aded Snyk validation for vulnerabilities.
 * Added pipelines for auto testing.
+* Added dataclass nested structure.
 
 ## v0.0.8
 
