@@ -1,11 +1,11 @@
 # pylint: disable=line-too-long
 """Package Supplied Utilities."""
 
-from typing import Any, Generator, Hashable, Union
+from typing import Any, Callable, Generator, Hashable, List, Union
 from collections.abc import MutableMapping
 
 from pathlib import Path
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, field
 import pandas as pd
 
 from pytoolkit.static import NONETYPE
@@ -156,6 +156,14 @@ def nested_dict(_dict: MutableMapping[str, Any], sep: str = ".") -> dict[str, An
     return result
 
 
+@dataclass
+class Matches:
+    """Extract a list of matcehs and non matching lists."""
+
+    matches: List[Any] = field(default_factory=lambda: [])
+    no_match: List[Any] = field(default_factory=lambda: [])
+
+
 def set_bool(value: Union[str, bool], default: bool = False) -> Union[str, bool]:
     """
     Sets bool value when pulling string from os env.
@@ -177,3 +185,26 @@ def set_bool(value: Union[str, bool], default: bool = False) -> Union[str, bool]
     elif Path.exists(Path(str(value))):
         value_bool = value
     return value_bool
+
+
+def extract_matches(
+    iterable: Union[list[Any], None], condition: Callable[[list[Any]], Any]
+) -> Matches:
+    """
+    Returns two lists; one that matches the condition and other that does not.
+     Use the condition variable to send callable functions used in a regular expression match.
+
+    :param iterable: Lists of Strings.
+    :type iterable: Union[list[Any], None]
+    :param condition: Callable function or lambda function.
+    :type condition: Callable[[list[Any]], Any]
+    :return: matches
+    :rtype: Matches
+    """
+    res = Matches([], [])
+    if not iterable:
+        return res
+    return Matches(
+        matches=[item for item in iterable if any(condition(item))],
+        no_match=[item for item in iterable if not any(condition(item))],
+    )

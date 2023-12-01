@@ -1,3 +1,4 @@
+# pylint: disable=broad-exception-caught
 """Utilities."""
 
 from enum import Enum
@@ -10,7 +11,7 @@ from typing import Any, List, Union
 import base64
 import re
 
-from pytoolkit.static import ENCODING
+from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4
 
 
 def os_plat() -> str:
@@ -80,6 +81,7 @@ def enum(*sequential: Any, **named: Any) -> type[Enum]:
 
 
 def isstring(arg: Any) -> bool:
+    """Verifies if an argument is a string."""
     try:
         return isinstance(arg, basestring)
     except NameError:
@@ -192,6 +194,20 @@ def return_username(log: Any = None) -> Union[str, None]:
     return None
 
 
+def gethostbyaddr(ip_addr: str) -> str:
+    """
+    Return FQDN from IP Address.
+
+    :param ip_addr: _description_
+    :type ip_addr: str
+    :return: _description_
+    :rtype: str
+    """
+    if not re.match(RE_IP4, ip_addr):
+        raise ValueError(f"Invalid IPv4 {ip_addr}")
+    return socket.gethostbyaddr(ip_addr)[0]
+
+
 def return_hostinfo(fqdn: bool = True) -> str:
     """
     Return Hostname information on system.
@@ -203,7 +219,10 @@ def return_hostinfo(fqdn: bool = True) -> str:
     """
     if fqdn:
         return socket.getfqdn()
-    return socket.gethostname()
+    host: str = socket.gethostname()
+    if re.match(RE_DOMAIN, host, re.IGNORECASE):
+        return (".").join(host.split(".")[:-2])
+    return host
 
 
 def set_bool(value: str, default: bool = False) -> Union[str, bool]:

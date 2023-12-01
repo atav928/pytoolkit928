@@ -2,7 +2,7 @@
 """Files."""
 
 import re
-from json import JSONEncoder
+import json
 from typing import Any, Union
 from pathlib import Path
 import platform
@@ -20,14 +20,14 @@ FILE_UMASK_PERMISSIONS = {
 }
 
 
-class BytesDump(JSONEnocder):
+class BytesDump(json.JSONEncoder):
     """Resovlve error with byte present in Dict."""
 
-    def default(self, obj: Any) -> Union[str, Any]:
+    def default(self, o: Any) -> Union[str, Any]:
         """Resolve error with byte in Dict."""
-        if isinstance(obj, bytes):
-            return obj.decode()
-        return JSONEncoder.default(self, obj)
+        if isinstance(o, bytes):
+            return o.decode()
+        return json.JSONEncoder.default(self, o)
 
 
 def read_yaml(filename: Path) -> dict[str, Any]:
