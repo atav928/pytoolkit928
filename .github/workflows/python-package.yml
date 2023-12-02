@@ -5,7 +5,7 @@ name: Python package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" , "develop"]
   pull_request:
     branches: [ $default-branch ]
 
@@ -39,3 +39,4 @@ jobs:
       run: |
         python -m pip install -e '.[test]'
         pytest
+      continue-on-error: false
