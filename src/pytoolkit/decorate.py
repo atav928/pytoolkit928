@@ -1,6 +1,7 @@
 # pylint: disable=too-many-arguments
 """Decorators."""
 
+from typing import Union, Any, Callable
 from functools import partial
 import functools
 from inspect import isfunction
@@ -10,9 +11,17 @@ import random
 from pytoolkit import decorator
 from pytoolkit.utils import reformat_exception
 
+
 def __retry_interval(
-        func, exceptions=Exception, tries=-1, delay=0, max_delay=None, backoff=1, jitter=0,
-        logger=None):
+    func: Callable[Any],
+    exceptions=Exception,
+    tries: int = -1,
+    delay: int = 0,
+    max_delay: Union[int, None] = None,
+    backoff: int = 1,
+    jitter: int = 0,
+    logger: Any = None,
+) -> Union[Any, None]:
     """
     Executes a function and retries it if it failed.
 
@@ -46,7 +55,9 @@ def __retry_interval(
             if not _tries:
                 raise
             if logger is not None:
-                logger.warning("msg=\"attempt failed\",error=%s,retrying_in=%ss", error, _delay)
+                logger.warning(
+                    'msg="attempt failed",error=%s,retrying_in=%ss', error, _delay
+                )
             time.sleep(_delay)
             _delay *= backoff
             if isinstance(jitter, tuple):
@@ -57,7 +68,15 @@ def __retry_interval(
                 _delay = min(_delay, max_delay)
 
 
-def retry(exceptions=Exception, tries=-1, delay=0, max_delay=None, backoff=1, jitter=0, logger=None):
+def retry(
+    exceptions=Exception,
+    tries: int = -1,
+    delay: int = 0,
+    max_delay: Union[int, None] = None,
+    backoff: int = 1,
+    jitter: int = 0,
+    logger: Any = None,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Returns a retry decorator.
 
@@ -80,17 +99,33 @@ def retry(exceptions=Exception, tries=-1, delay=0, max_delay=None, backoff=1, ji
     :return: a retry decorator.
     :rtype: function
     """
+
     @decorator
     def retry_decorator(func, *fargs, **fkwargs):
         args = fargs if fargs else list()
         kwargs = fkwargs if fkwargs else dict()
         return __retry_interval(
             partial(func, *args, **kwargs),
-            exceptions, tries, delay, max_delay, backoff, jitter, logger)
+            exceptions,
+            tries,
+            delay,
+            max_delay,
+            backoff,
+            jitter,
+            logger,
+        )
+
     return retry_decorator
 
 
-def __exception_handler(func, exceptions=Exception, default_return=None, message="", logger=None, func_params={}):  # pylint: disable=dangerous-default-value
+def __exception_handler(
+    func,
+    exceptions=Exception,
+    default_return=None,
+    message="",
+    logger=None,
+    func_params={},
+):  # pylint: disable=dangerous-default-value
     """Exception Handler Decorator."""
     try:
         return func()
@@ -99,14 +134,17 @@ def __exception_handler(func, exceptions=Exception, default_return=None, message
         if logger:
             # need to call func.func to get the original callable function name since created by partial()
             logger.fatal(
-                f"function={func.func.__name__},error=\"{message}:error_raw={error}\",level=error")
+                f'function={func.func.__name__},error="{message}:error_raw={error}",level=error'
+            )
     if isinstance(default_return, functools.partial):
         return default_return(error=error, level="fatal")
     if default_return:
         return default_return
 
 
-def error_handler(exceptions=Exception, default_return=None, logger=None, func_params={}):  # pylint: disable=dangerous-default-value
+def error_handler(
+    exceptions=Exception, default_return=None, logger=None, func_params={}
+):  # pylint: disable=dangerous-default-value
     """
     Error Handler excption; allows passing a default return value if needed.
 
@@ -121,6 +159,7 @@ def error_handler(exceptions=Exception, default_return=None, logger=None, func_p
     :return: _description_
     :rtype: _type_
     """
+
     @decorator
     def error_handle_decorator(func, *fargs, **fkwargs):
         args = fargs if fargs else list()
@@ -128,12 +167,17 @@ def error_handler(exceptions=Exception, default_return=None, logger=None, func_p
         if isfunction(default_return):
             func_params.update({"func_name": func.__name__})
             func_params.update(kwargs)
-            func_params.update({("args" + str(idx+1)): arg for idx, arg in enumerate(args)})
+            func_params.update(
+                {("args" + str(idx + 1)): arg for idx, arg in enumerate(args)}
+            )
             return __exception_handler(
                 partial(func, *args, **kwargs),
-                exceptions, partial(default_return, **func_params),
-                logger)
+                exceptions,
+                partial(default_return, **func_params),
+                logger,
+            )
         return __exception_handler(
-            partial(func, *args, **kwargs),
-            exceptions, default_return, logger)
+            partial(func, *args, **kwargs), exceptions, default_return, logger
+        )
+
     return error_handle_decorator
