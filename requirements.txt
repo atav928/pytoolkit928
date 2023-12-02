@@ -4,4 +4,4 @@ pathlib
 dataclasses
 PyYaml
 pandas
-numpy
+numpy>=1.22.2
