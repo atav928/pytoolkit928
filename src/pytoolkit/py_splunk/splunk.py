@@ -2,7 +2,27 @@
 
 from collections import OrderedDict
 import datetime
-from typing import Any, Union
+from typing import Any, Optional, Union
+
+from dataclasses import dataclass
+
+from pytoolkit.utilities import BaseMonitor, NONETYPE
+
+
+@dataclass
+class SplunkHecHeader(BaseMonitor):
+    """Splunk Hec Header."""
+
+    splunk_server: str
+    token: str
+    sourcetype: Optional[str] = NONETYPE
+    source: Optional[str] = NONETYPE
+    index: Optional[str] = NONETYPE
+    splunk_port: int = 8088
+    verify: Union[str, bool] = True
+    upload: bool = True
+    timeout: float = 15.0
+    schema: str = "https"
 
 
 def splunk_format(**kwargs: Any) -> str:
