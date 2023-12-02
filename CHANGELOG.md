@@ -1,5 +1,17 @@
 # Releases
 
+## v0.0.11
+
+* __BUG:__ issue with typing on retry decorator.
+* Updated failed pytest coverage to install test modules.
+
+## v0.0.10
+
+* Added SplunkHec dataclass.
+* Added Nested Dataclass decorator.
+* Added additional UnitTests.
+* Updated deploy and codeql pipelines.
+
 ## v0.0.9
 
 * Cleaned up Base Dataclass module.
