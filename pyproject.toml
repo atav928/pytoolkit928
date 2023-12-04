@@ -55,4 +55,4 @@ namespaces = true
 source = ["src"]
 
 [tool.pylint]
-max-line-length = 101
+max-line-length = 127
