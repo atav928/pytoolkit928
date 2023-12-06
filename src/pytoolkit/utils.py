@@ -245,3 +245,24 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     elif Path.exists(Path(value)):
         value_bool = value
     return value_bool
+
+def get_config_location(config_location: list[str]) -> str:
+    """
+    Retrieve configuraiton lcoation if one exists in the paths to search.
+
+        Ex:
+            config_location = [
+                str(Path.joinpath(Path.home() / ".config/application.yaml")),
+                str(Path.joinpath(Path.home() / ".config/application.yml")),
+                str(Path("/etc/appname/appconfig.yaml")),
+                str(Path("/Users/guest/Library/logs/appname/appconfig.yml"))
+            ]
+    :param config_location: _description_
+    :type config_location: list[str]
+    :return: _description_
+    :rtype: str
+    """
+    for location in config_location:
+        if Path.is_file(Path(location)):
+            return location
+        return ""
