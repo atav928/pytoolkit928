@@ -150,7 +150,7 @@ def check_file(filename: str) -> None:
     if not Path(filename).is_file():
         raise ValueError(f"Not a file {filename}")
 
-def get_config_location(config_location: list[str]) -> str:
+def get_config_location(config_location: list[str], app_name: Union[str, None] = None) -> str:
     """
     Retrieve configuraiton lcoation if one exists in the paths to search.
 
@@ -167,6 +167,9 @@ def get_config_location(config_location: list[str]) -> str:
     :rtype: str
     """
     for location in config_location:
-        if Path.is_file(Path(location)):
+        # TODO: Allow for diff types as currentlu just allowing yaml.
+        if Path.is_file(Path(
+            CONFIG_PATH.format(location,app_name) if app_name else location)
+        ):
             return location
         return ""
