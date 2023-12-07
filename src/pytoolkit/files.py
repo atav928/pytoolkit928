@@ -10,7 +10,7 @@ import tempfile
 
 import yaml
 
-from pytoolkit.static import (ENCODING, FILE_UMASK_PERMISSIONS)
+from pytoolkit.static import (ENCODING, FILE_UMASK_PERMISSIONS, CONFIG_PATH)
 
 class BytesDump(json.JSONEncoder):
     """Resovlve error with byte present in Dict."""
