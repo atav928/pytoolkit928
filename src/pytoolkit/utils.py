@@ -11,7 +11,8 @@ from typing import Any, List, Union
 import base64
 import re
 
-from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4
+from pytoolkit.static import (ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS)
+from pytoolkit.utilities import flatten_dictionary, nested_dict
 
 
 def os_plat() -> str:
@@ -246,23 +247,18 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
         value_bool = value
     return value_bool
 
-def get_config_location(config_location: list[str]) -> str:
-    """
-    Retrieve configuraiton lcoation if one exists in the paths to search.
 
-        Ex:
-            config_location = [
-                str(Path.joinpath(Path.home() / ".config/application.yaml")),
-                str(Path.joinpath(Path.home() / ".config/application.yml")),
-                str(Path("/etc/appname/appconfig.yaml")),
-                str(Path("/Users/guest/Library/logs/appname/appconfig.yml"))
-            ]
-    :param config_location: _description_
-    :type config_location: list[str]
-    :return: _description_
-    :rtype: str
+def sanatize_data(data: dict[str,Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:
     """
-    for location in config_location:
-        if Path.is_file(Path(location)):
-            return location
-        return ""
+    Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+
+    :param data: _description_
+    :type data: dict[str,Any]
+    :param keys: _description_, defaults to SANATIZE_KEYS
+    :type keys: list[str], optional
+    :return: _description_
+    :rtype: dict[str, Any]
+    """
+    flat = flatten_dictionary(data)
+    new_dict = {key: '[MASKED]' if isinstance(key,str) and key.lower() in keys else value for key, value in flat.items()}
+    return nested_dict(new_dict)

@@ -10,15 +10,7 @@ import tempfile
 
 import yaml
 
-from pytoolkit.static import ENCODING
-
-# See https://www.linuxtrainingacademy.com/all-umasks/
-FILE_UMASK_PERMISSIONS = {
-    "default": 0o40775,  # umask 002 rw-rw-r- rwxrwx-r
-    "restrictive": 0o40770,  # umask 037 rw-r--- rwxr---
-    "root": 0o40755,  # umask 022 rw-r-r- rwxr-xr-x
-}
-
+from pytoolkit.static import (ENCODING, FILE_UMASK_PERMISSIONS)
 
 class BytesDump(json.JSONEncoder):
     """Resovlve error with byte present in Dict."""
@@ -29,6 +21,23 @@ class BytesDump(json.JSONEncoder):
             return o.decode()
         return json.JSONEncoder.default(self, o)
 
+def get_config_section(filename: str, ftype: str, section: str = ""):
+    """
+    Returns a configuration dictionary or a section of a configuration if found.
+
+    :param filename: _description_
+    :type filename: str
+    :param ftype: _description_
+    :type ftype: str
+    :param section: _description_, defaults to ""
+    :type section: str, optional
+    :return: _description_
+    :rtype: _type_
+    """
+    settings = read_yaml(Path(filename))
+    if section:
+        settings = settings.get(section, {})
+    return settings
 
 def read_yaml(filename: Path) -> dict[str, Any]:
     """
@@ -140,3 +149,24 @@ def check_file(filename: str) -> None:
     """
     if not Path(filename).is_file():
         raise ValueError(f"Not a file {filename}")
+
+def get_config_location(config_location: list[str]) -> str:
+    """
+    Retrieve configuraiton lcoation if one exists in the paths to search.
+
+        Ex:
+            config_location = [
+                str(Path.joinpath(Path.home() / ".config/application.yaml")),
+                str(Path.joinpath(Path.home() / ".config/application.yml")),
+                str(Path("/etc/appname/appconfig.yaml")),
+                str(Path("/Users/guest/Library/logs/appname/appconfig.yml"))
+            ]
+    :param config_location: _description_
+    :type config_location: list[str]
+    :return: _description_
+    :rtype: str
+    """
+    for location in config_location:
+        if Path.is_file(Path(location)):
+            return location
+        return ""
