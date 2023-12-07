@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from pytoolkit.utilities import BaseMonitor, NONETYPE
 
+splunk_url = "{}//{}:{}"
 
 @dataclass
 class SplunkHecHeader(BaseMonitor):
@@ -62,7 +63,7 @@ def splunk_hec_format(
         "host": host,
         "source": source,
         "sourcetype": sourcetype,
-        "events": {},
+        "event": {},
     }
     if metrics_list:
         # Build HEC style Metrics

@@ -221,7 +221,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return '.'.join(host.split('.')[:-2]) if '.'.join(host.split('.')[:-2]) != '' else '.'.join(host.split('.')[:-1])
+        return '.'.join(host.split('.')[:-2]).lower() if '.'.join(host.split('.')[:-2]).lower() != '' else '.'.join(host.split('.')[:-1]).lower()
     return host
 
 
