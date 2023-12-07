@@ -150,7 +150,7 @@ def check_file(filename: str) -> None:
     if not Path(filename).is_file():
         raise ValueError(f"Not a file {filename}")
 
-def get_config_location(config_location: list[str], app_name: Union[str, None] = None) -> str:
+def get_config_location(config_location: list[str], app_name: Union[str, None] = None, file_format: str = "yml") -> str:
     """
     Retrieve configuraiton lcoation if one exists in the paths to search.
 
@@ -169,7 +169,7 @@ def get_config_location(config_location: list[str], app_name: Union[str, None] =
     for location in config_location:
         # TODO: Allow for diff types as currentlu just allowing yaml.
         if Path.is_file(Path(
-            CONFIG_PATH.format(location,app_name) if app_name else location)
+            CONFIG_PATH.format(location,app_name, file_format) if app_name else location)
         ):
             return location
         return ""
