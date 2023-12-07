@@ -214,14 +214,14 @@ def return_hostinfo(fqdn: bool = True) -> str:
 
     :param fqdn: Retun FQDN or Hostname, defaults to True
     :type fqdn: bool, optional
-    :return: System Hostname/FQDN
+    :return: System Hostname/FQDN or root domain.
     :rtype: str
     """
     if fqdn:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return (".").join(host.split(".")[:-2])
+        return '.'.join(host.split('.')[:-2]) if '.'.join(host.split('.')[:-2]) != '' else '.'.join(host.split('.')[:-1])
     return host
 
 

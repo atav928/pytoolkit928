@@ -1,5 +1,9 @@
 # Releases
 
+## v0.0.12
+
+* Fixed issue with regex that doesn't match correctly.
+
 ## v0.0.11
 
 * __BUG:__ issue with typing on retry decorator.
