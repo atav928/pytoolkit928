@@ -194,6 +194,20 @@ def return_username(log: Any = None) -> Union[str, None]:
             log.error(f'msg="Unable to get username"|{error=}')
     return None
 
+def gethostipaddr(hostname: str) -> str:
+    """
+    Returns IP address of local host. Caution if multiple addresses are rturne due to load balancer.
+
+    :param hostname: _description_
+    :type hostname: str
+    :raises ValueError: _description_
+    :return: _description_
+    :rtype: str
+    """
+    ipv4 = socket.gethostbyname(hostname)
+    if not re.match(RE_IP4, ipv4):
+        raise ValueError(f"Invalid Address {ipv4}")
+    return f'{ipv4}/32' if ipv4.split('/')[-1] != "32" else ipv4
 
 def gethostbyaddr(ip_addr: str) -> str:
     """
