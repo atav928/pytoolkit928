@@ -13,7 +13,7 @@ from pytoolkit.utils import reformat_exception
 
 
 def __retry_interval(
-    func: Callable[[Any],Any],
+    func: Callable[[Any], Any],
     exceptions=Exception,
     tries: int = -1,
     delay: int = 0,

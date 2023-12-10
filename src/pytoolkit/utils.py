@@ -11,7 +11,8 @@ from typing import Any, List, Union
 import base64
 import re
 
-from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4
+from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
+from pytoolkit.utilities import flatten_dictionary, nested_dict
 
 
 def os_plat() -> str:
@@ -194,6 +195,22 @@ def return_username(log: Any = None) -> Union[str, None]:
     return None
 
 
+def gethostipaddr(hostname: str) -> str:
+    """
+    Returns IP address of local host. Caution if multiple addresses are rturne due to load balancer.
+
+    :param hostname: _description_
+    :type hostname: str
+    :raises ValueError: _description_
+    :return: _description_
+    :rtype: str
+    """
+    ipv4 = socket.gethostbyname(hostname)
+    if not re.match(RE_IP4, ipv4):
+        raise ValueError(f"Invalid Address {ipv4}")
+    return f"{ipv4}/32" if ipv4.split("/")[-1] != "32" else ipv4
+
+
 def gethostbyaddr(ip_addr: str) -> str:
     """
     Return FQDN from IP Address.
@@ -221,7 +238,11 @@ def return_hostinfo(fqdn: bool = True) -> str:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return '.'.join(host.split('.')[:-2]) if '.'.join(host.split('.')[:-2]) != '' else '.'.join(host.split('.')[:-1])
+        return (
+            ".".join(host.split(".")[:-2])
+            if ".".join(host.split(".")[:-2]) != ""
+            else ".".join(host.split(".")[:-1])
+        )
     return host
 
 
@@ -245,3 +266,24 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     elif Path.exists(Path(value)):
         value_bool = value
     return value_bool
+
+
+def sanatize_data(
+    data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
+) -> dict[str, Any]:
+    """
+    Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+
+    :param data: _description_
+    :type data: dict[str,Any]
+    :param keys: _description_, defaults to SANATIZE_KEYS
+    :type keys: list[str], optional
+    :return: _description_
+    :rtype: dict[str, Any]
+    """
+    flat = flatten_dictionary(data)
+    new_dict = {
+        key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value
+        for key, value in flat.items()
+    }
+    return nested_dict(new_dict)
