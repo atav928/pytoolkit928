@@ -6,4 +6,4 @@ PyYaml
 pandas
 numpy>=1.22.2
 paramiko
-requests>=2.28.2
+requests
