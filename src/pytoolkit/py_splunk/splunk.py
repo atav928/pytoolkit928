@@ -5,7 +5,7 @@ import datetime
 from typing import Any, Optional, Union
 
 from dataclasses import dataclass
-from requests import request
+import requests
 
 from pytoolkit.utilities import BaseMonitor, NONETYPE
 

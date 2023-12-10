@@ -1,9 +1,14 @@
 # Releases
 
+## v0.0.13
+
+* __BUG:__ Import error.
+
 ## v0.0.12
 
 * Fixed issue with regex that doesn't match correctly.
 * Added function to create ability to search for a configuraiton file based on passed ordered list of places to search for a configuration file to read.
+* Added remote ssh connector.
 
 ## v0.0.11
 

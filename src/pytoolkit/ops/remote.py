@@ -8,7 +8,7 @@ from paramiko.client import SSHClient
 
 from pytoolkit.ops.models import SubProcessReturn, Connector
 from pytoolkit.static import DISABLED_ALGORITHMS, SSH_PORT
-
+from pytoolkit.utils import string_or_list
 
 def _ssh_client():
     return paramiko.SSHClient()
