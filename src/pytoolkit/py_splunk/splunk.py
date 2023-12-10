@@ -72,8 +72,8 @@ def splunk_hec_format(
             f"metric_name:{metric}": kwargs.pop(metric, None) for metric in metrics_list
         }
         hec_json["fields"] = dict(sorted(hec_json["fields"].items()))
-    hec_json["events"] = {**hec_json["events"], **kwargs}
-    hec_json["events"] = dict(sorted(hec_json["events"].items()))
+    hec_json["event"] = {**hec_json["event"], **kwargs}
+    hec_json["event"] = dict(sorted(hec_json["event"].items()))
     return hec_json
 
 def splunk_upload(
