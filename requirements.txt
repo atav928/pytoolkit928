@@ -5,5 +5,5 @@ dataclasses
 PyYaml
 pandas
 numpy>=1.22.2
-paramiko
+paramiko<=3.3.0
 requests
