@@ -64,7 +64,7 @@ class SSHConnector:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value):
+    def timeout(self, value: float):
         self._timeout = value
 
     def connect(self):

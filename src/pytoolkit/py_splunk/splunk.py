@@ -5,6 +5,7 @@ import datetime
 from typing import Any, Optional, Union
 
 from dataclasses import dataclass
+from requests import request
 
 from pytoolkit.utilities import BaseMonitor, NONETYPE
 
@@ -74,3 +75,45 @@ def splunk_hec_format(
     hec_json["events"] = {**hec_json["events"], **kwargs}
     hec_json["events"] = dict(sorted(hec_json["events"].items()))
     return hec_json
+
+def splunk_upload(
+    server: str,
+    token: str,
+    hec_data: Any,
+    verify: Any,
+    timeout: float,
+    port: int = 8088,
+    chunk_size: int = 0,
+):
+    """
+    Upload Splunk Data.
+
+    :param server: _description_
+    :type server: str
+    :param token: _description_
+    :type token: str
+    :param hec_data: _description_
+    :type hec_data: Any
+    :param verify: _description_
+    :type verify: str
+    :param port: _description_, defaults to 8088
+    :type port: int, optional
+    :param chunk_size: Set size to split up data into if too large;
+     hec_data must be a list of json entries, defaults to 0 or all data
+    :type chunk_size: int, optional
+    """
+    EVENTPATH = "services/collector/event"
+    # split_list = list(split(hec_json_list, 10))
+    # for server in server_list:
+    url = f"https://{server}:{port}/{EVENTPATH}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Splunk {token}",
+        "X-Splunk-Request-Channel": token,
+    }
+    payload = hec_data
+    response = requests.post(
+        url, headers=headers, json=payload, verify=verify, timeout=timeout
+    )
+    msg = f'msg="uploaded splunk data response"|status_code={response.status_code}, response={response.json()}'
+    response.raise_for_status()
