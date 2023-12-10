@@ -3,6 +3,7 @@
 ## v0.0.12
 
 * Fixed issue with regex that doesn't match correctly.
+* Added function to create ability to search for a configuraiton file based on passed ordered list of places to search for a configuration file to read.
 
 ## v0.0.11
 

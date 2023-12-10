@@ -28,6 +28,7 @@ def test_getfqdn():
         result = utils.return_hostinfo(fqdn=True)
         assert result == "server01.b100.example.com"
 
+
 def test_gethostname():
     # Create a mock object for the socket module
     with mock.patch("socket.gethostname") as mock_hostname:
@@ -36,6 +37,7 @@ def test_gethostname():
         result = utils.return_hostinfo(fqdn=False)
         print(result)
         assert result == "server01.b100"
+
 
 class TestStringMethods(unittest.TestCase):
     def test_os(self) -> None:

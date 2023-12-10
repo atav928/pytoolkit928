@@ -3,7 +3,6 @@
 import functools
 
 from pytoolkit._version import __version__
-from pytoolkit.py_mailer.mailer import send_mail
 
 try:
     from decorator import decorator
