@@ -268,7 +268,7 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(
+def sanatize_data( # pylint: disable=dangerous-default-value
     data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
 ) -> dict[str, Any]:
     """
@@ -287,3 +287,28 @@ def sanatize_data(
         for key, value in flat.items()
     }
     return nested_dict(new_dict)
+
+def convert_list_to_dict(lst: list[str]) -> dict[str, str]:
+    """
+    Converts a list to a dictionary.
+
+    :param lst: List of strings.
+    :type lst: list[str]
+    :return: Converted list of strings as a Key: Value pair.
+    :rtype: dict
+    """
+    res_dct = map(lambda i: (lst[i], lst[i+1]), range(len(lst)-1)[::2])
+    return dict(res_dct)
+
+def convert_dict_to_string(_dict: dict[str, Any]) -> str:
+    """
+    Convert a dictionary into a string output.
+     Make sure the dictionary is not nested.
+     Use flattening function if it is.
+
+    :param _dict: Flattened Dictionary
+    :type _dict: dict[str, Any]
+    :return: string
+    :rtype: str
+    """
+    return ' '.join([f'{k} {v}' for k,v in _dict.items()])
