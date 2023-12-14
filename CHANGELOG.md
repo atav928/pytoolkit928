@@ -1,5 +1,15 @@
 # Releases
 
+__Todo:__
+
+* Add import key option to SSH Client.
+  * Uae ability to pass a string ot byte feom me
+ory.
+  * Use add from file.
+  * Block Password if using Key.
+* Update to extract method to enhanxe the callable lambda fucntions.
+  * Add readme to make more usable.
+
 ## v0.0.12
 
 * Fixed issue with regex that doesn't match correctly.
