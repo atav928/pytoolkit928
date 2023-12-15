@@ -14,6 +14,7 @@ import re
 from pytoolkit.static import (ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS)
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
+pattern = re.compile(r'(?<!^)(?=[A-Z])')
 
 def os_plat() -> str:
     """
@@ -276,3 +277,14 @@ def sanatize_data(data: dict[str,Any], keys: list[str] = SANATIZE_KEYS) -> dict[
     flat = flatten_dictionary(data)
     new_dict = {key: '[MASKED]' if isinstance(key,str) and key.lower() in keys else value for key, value in flat.items()}
     return nested_dict(new_dict)
+
+def camel_to_snake(name: str):
+    """
+    Convert simple Camel to Snake case does not handle complex patterns.
+
+    :param name: _description_
+    :type name: str
+    :return: _description_
+    :rtype: _type_
+    """
+    return pattern.sub('_', name).lower()
