@@ -276,3 +276,36 @@ def sanatize_data(data: dict[str,Any], keys: list[str] = SANATIZE_KEYS) -> dict[
     flat = flatten_dictionary(data)
     new_dict = {key: '[MASKED]' if isinstance(key,str) and key.lower() in keys else value for key, value in flat.items()}
     return nested_dict(new_dict)
+
+def split(event_list: list[Any], chunk_size: int):
+    """
+    Generator that yels n-sized chuncks.
+       Ex: list(split(range(0,300),10))
+             [[x,x,x,x,x],
+              [x,x,x,x,x]]
+
+    :param event_list: _description_
+    :type event_list: _type_
+    :param chunk_size: _description_
+    :type chunk_size: _type_
+    :yield: _description_
+    :rtype: _type_
+    """
+    for i in range(0, len(event_list), chunk_size):
+        yield event_list[i:i + chunk_size]
+
+# Lambda func for chunk for quick object
+chunk = lambda lst,n:[lst[i:i + n] for i in range(0, len(lst), n)]
+
+def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
+    """
+    Splits up events into chunks.
+
+    :param lst: _description_
+    :type lst: list[Any]
+    :param n: _description_
+    :type n: int
+    :return: _description_
+    :rtype: list[list[Any]]
+    """
+    return [lst[i:i + n] for i in range(0, len(lst), n)]
