@@ -306,10 +306,12 @@ def split(event_list: list[Any], chunk_size: int):
     :rtype: _type_
     """
     for i in range(0, len(event_list), chunk_size):
-        yield event_list[i:i + chunk_size]
+        yield event_list[i : i + chunk_size]
+
 
 # Lambda func for chunk for quick object
-chunk = lambda lst,n:[lst[i:i + n] for i in range(0, len(lst), n)]
+chunk = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]
+
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     """
@@ -322,7 +324,7 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     :return: _description_
     :rtype: list[list[Any]]
     """
-    return [lst[i:i + n] for i in range(0, len(lst), n)]
+    return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
 def camel_to_snake(name: str):

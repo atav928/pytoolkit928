@@ -5,3 +5,4 @@ dataclasses
 PyYaml
 pandas
 numpy>=1.22.2
+requests>=2.28.2

@@ -36,3 +36,4 @@ SANATIZE_KEYS = [
     "auth",
 ]
 CONFIG_PATH = "{}/{}.{}"
+SPLUNK_HEC_EVENTPATH = "services/collector/event"

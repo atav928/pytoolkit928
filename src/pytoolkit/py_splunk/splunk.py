@@ -1,12 +1,21 @@
+# pylint: disable=logging-fstring-interpolation
 """Splunk Integrations."""
 
 from collections import OrderedDict
 import datetime
 from typing import Any, Optional, Union
+import logging
 
 from dataclasses import dataclass
 
+import urllib3
+import requests
+
+from pytoolkit.static import SPLUNK_HEC_EVENTPATH
 from pytoolkit.utilities import BaseMonitor, NONETYPE
+from pytoolkit.utils import chunk, reformat_exception
+
+splunk_log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -37,7 +46,6 @@ def splunk_format(**kwargs: Any) -> str:
     return ",".join(string)
 
 
-# TODO: fix the ability to send HEC formats in chuncks. ippoad
 def splunk_hec_format(
     host: str,
     source: str,
@@ -65,7 +73,7 @@ def splunk_hec_format(
         "events": {},
     }
     if metrics_list:
-        # Build HEC style Metrics
+        # Build HEC Style Metrics
         hec_json["fields"] = {
             f"metric_name:{metric}": kwargs.pop(metric, None) for metric in metrics_list
         }
@@ -73,3 +81,67 @@ def splunk_hec_format(
     hec_json["events"] = {**hec_json["events"], **kwargs}
     hec_json["events"] = dict(sorted(hec_json["events"].items()))
     return hec_json
+
+
+def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
+    server: str,
+    token: str,
+    hec_data: list[dict[str, Any]],
+    timeout: float = 15.0,
+    verify: Union[str, bool] = True,
+    port: int = 8088,
+    chunk_size: int = 100,
+    log: Any = splunk_log,
+):
+    """
+    Upload Splunk Data.
+
+    :param server: _description_
+    :type server: str
+    :param token: _description_
+    :type token: str
+    :param hec_data: List of dictionary events.
+    :type hec_data: list[str,Any]
+    :param verify: Validation of Rest call
+    :type verify: [str|bool]
+    :param port: Port to use, defaults to 8088
+    :type port: int, optional
+    :param chunk_size: Set size to split up data into if too large;
+     hec_data must be a list of json entries, defaults to 100 (0 will indicate all)
+    :type chunk_size: int, optional
+    """
+    if not verify:
+        log.error(f'msg="SSL Verficiation is off recommended this be fixed"|{verify=}')
+        urllib3.disable_warnings  # pylint: disable=pointless-statement
+    url = f"https://{server}:{port}/{SPLUNK_HEC_EVENTPATH}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Splunk {token}",
+        "X-Splunk-Request-Channel": token,
+    }
+    chunk_data: list[list[Any]] = (
+        chunk(hec_data, chunk_size) if len(hec_data) > chunk_size > 0 else [hec_data]
+    )
+    resp_list: list[dict[str, Any]] = []
+    for payload in chunk_data:
+        response = requests.post(
+            url, headers=headers, json=payload, verify=verify, timeout=timeout
+        )
+        splunk_log.info(
+            f'msg="uploaded splunk data response"|status_code={response.status_code}, response={response.json()}'
+        )
+        resp_list.append(
+            {
+                "status_code": response.status_code,
+                "payload_len": len(payload),
+                "message": response.json() if response.json() else "",
+            }
+        )
+        try:
+            response.raise_for_status()
+        except Exception as err:
+            error = reformat_exception(err)
+            splunk_log.error(
+                f'msg="Unable to upload datea to splunk server"|splunk_server={server}, {error=}'
+            )
+    return resp_list
