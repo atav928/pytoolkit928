@@ -1,8 +1,22 @@
 # Releases
 
+## v0.0.15
+
+* Removed SSH and Pamiko module; split over to another project.
+* Add chunk/split into splunk upload.
+
 ## v0.0.14
 
 * __BUG:__ Import error.
+__Todo:__
+
+* Add import key option to SSH Client.
+  * Uae ability to pass a string ot byte feom me
+ory.
+  * Use add from file.
+  * Block Password if using Key.
+* Update to extract method to enhanxe the callable lambda fucntions.
+  * Add readme to make more usable.
 
 ## v0.0.12
 

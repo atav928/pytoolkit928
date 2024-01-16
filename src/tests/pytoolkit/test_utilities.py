@@ -102,7 +102,3 @@ class TestDictionaries(unittest.TestCase):
         )
         self.assertTrue(len(results.matches), 2)
         self.assertTrue(len(results.no_match), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

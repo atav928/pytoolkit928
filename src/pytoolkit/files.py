@@ -183,9 +183,12 @@ def get_config_location(
     """
     for location in config_location:
         # TODO: Allow for diff types as currentlu just allowing yaml.
-        # if Path.is_file(Path(
-        #    CONFIG_PATH.format(location,app_name, file_format) if app_name else location)
-        # ):
-        if Path.is_file(Path(location)):
+        if Path.is_file(
+            Path(
+                CONFIG_PATH.format(location, app_name, file_format)
+                if app_name
+                else location
+            )
+        ):
             return location
         return ""
