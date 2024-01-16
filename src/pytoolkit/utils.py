@@ -10,9 +10,18 @@ import socket
 from typing import Any, List, Union
 import base64
 import re
+import json
 
-from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
+import airportsdata
+
+from pytoolkit.decorate import error_handler
+from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
 from pytoolkit.utilities import flatten_dictionary, nested_dict
+
+PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
+AIRPORTDATA = json.loads(
+    json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False)
+)
 
 
 def os_plat() -> str:
@@ -129,6 +138,9 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
         ]
     )
 
+def reform_except(error: Exception):
+    """Shorter function call that calls `reformat_exception` Exception."""
+    return reformat_exception(error=error)
 
 def reformat_exception(error: Exception) -> str:
     """
@@ -268,7 +280,7 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(
+def sanatize_data(  # pylint: disable=W0102
     data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
 ) -> dict[str, Any]:
     """
@@ -287,3 +299,114 @@ def sanatize_data(
         for key, value in flat.items()
     }
     return nested_dict(new_dict)
+
+
+def split(event_list: list[Any], chunk_size: int):
+    """
+    Generator that yels n-sized chuncks.
+       Ex: list(split(range(0,300),10))
+             [[x,x,x,x,x],
+              [x,x,x,x,x]]
+
+    :param event_list: _description_
+    :type event_list: _type_
+    :param chunk_size: _description_
+    :type chunk_size: _type_
+    :yield: _description_
+    :rtype: _type_
+    """
+    for i in range(0, len(event_list), chunk_size):
+        yield event_list[i : i + chunk_size]
+
+
+# Lambda func for chunk for quick object
+chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]  # type: ignore # pylint: disable=C3001,line-too-long
+
+
+def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
+    """
+    Splits up events into chunks.
+
+    :param lst: _description_
+    :type lst: list[Any]
+    :param n: _description_
+    :type n: int
+    :return: _description_
+    :rtype: list[list[Any]]
+    """
+    return [lst[i : i + n] for i in range(0, len(lst), n)]
+
+
+def camel_to_snake(name: str):
+    """
+    Convert simple Camel to Snake case does not handle complex patterns.
+
+    Example:
+        >>> value = 'someValue'
+        >>> camel_to_snake(value)
+        `some_value`
+
+    :param name: Value to convert in camelCase.
+    :type name: str
+    :return: Snake case value.
+    :rtype: str
+    """
+    return PATTERN.sub("_", name).lower()
+
+
+def snake_to_camel(name: str) -> str:
+    """
+    Convert Snake Case into Camel Case.
+
+    Example:
+        >>> value="snake_format"
+        >>> snake_to_camel(value)
+        'snakeFormat'
+
+    :param name: Value to convert to snake_case.
+    :type name: str
+    :return: snake_case value.
+    :rtype: str
+    """
+    init, *temp = name.split("_")
+    return "".join([init.lower(), *map(str.title, temp)])
+
+
+@error_handler(default_return=NO_AIRPORTDATA)
+def get_airport_info(airport_code: str) -> dict[str, Any]:
+    """
+    Extracts Airport Code from Airport Database using the `IATA` value.
+
+    :param airport_code: `IATA` airport code
+    :type airport_code: str
+    :return: Airport Information. Returns Emtpy Dictionary if not found or invalid
+    :rtype: dict[str,Any]
+    """
+    return AIRPORTDATA[airport_code.upper()]
+
+
+def convert_list_to_dict(lst: list[str]) -> dict[str, str]:
+    """
+    Converts a list to a dictionary.
+
+    :param lst: List of strings.
+    :type lst: list[str]
+    :return: Converted list of strings as a Key: Value pair.
+    :rtype: dict
+    """
+    res_dct = map(lambda i: (lst[i], lst[i+1]), range(len(lst)-1)[::2])
+    return dict(res_dct)
+
+
+def convert_dict_to_string(_dict: dict[str, Any]) -> str:
+    """
+    Convert a dictionary into a string output.
+     Make sure the dictionary is not nested.
+     Use flattening function if it is.
+
+    :param _dict: Flattened Dictionary
+    :type _dict: dict[str, Any]
+    :return: string
+    :rtype: str
+    """
+    return ' '.join([f'{k} {v}' for k,v in _dict.items()])

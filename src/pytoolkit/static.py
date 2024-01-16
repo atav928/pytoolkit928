@@ -34,6 +34,8 @@ SANATIZE_KEYS = [
     "cert",
     "authorization",
     "auth",
+    "-p",
+    "-P",
 ]
 CONFIG_PATH = "{}/{}.{}"
 SSH_PORT = 22
@@ -53,3 +55,17 @@ DISABLED_ALGORITHMS = {
         "diffie-hellman-group-exchange-sha1",
     ],
 }
+NO_AIRPORTDATA = {
+    "icao": None,
+    "iata": None,
+    "name": None,
+    "city": None,
+    "subd": None,
+    "country": None,
+    "elevation": None,
+    "lat": None,
+    "lon": None,
+    "tz": None,
+    "lid": None,
+}
+SPLUNK_HEC_EVENTPATH = "services/collector/event"

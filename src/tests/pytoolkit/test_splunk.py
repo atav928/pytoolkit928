@@ -39,13 +39,9 @@ class TestSplunk(unittest.TestCase):
             **sample_data,
         )
         self.assertIsInstance(hec["event"], dict)
-        self.assertIs(hec["events"]["index"], "some_index")
+        self.assertIs(hec["event"]["index"], "some_index")
 
     def test_splunk_form(self) -> None:
         string: str = splunk.splunk_format(**sample_data)
         print("Converting Splunk Data Dictionary to a string format.")
         self.assertIsInstance(string, str)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -7,9 +7,26 @@ import functools
 from inspect import isfunction
 import time
 import random
+import re
 
 from pytoolkit import decorator
-from pytoolkit.utils import reformat_exception
+
+
+def __reform_except(error: Exception) -> str:
+    """
+    Reformates Exception to print out as a string pass for logging.
+
+    :param error: caught excpetion
+    :type error: Exception
+    :return: error as string
+    :rtype: str
+    """
+    resp: str = f"{type(error).__name__}: {str(error)}" if error else ""
+    # Replacing [ ] with list() due to issues with reading that format with some systems.
+    resp = re.sub(r"\'", "", resp)
+    resp = re.sub(r"\[", "list(", resp)
+    resp = re.sub(r"\]", ")", resp)
+    return resp
 
 
 def __retry_interval(
@@ -51,7 +68,7 @@ def __retry_interval(
             return func()
         except exceptions as err:
             _tries -= 1
-            error = reformat_exception(err)
+            error = __reform_except(err)
             if not _tries:
                 raise
             if logger is not None:
@@ -130,7 +147,7 @@ def __exception_handler(
     try:
         return func()
     except exceptions as err:
-        error = reformat_exception(err)
+        error = __reform_except(err)
         if logger:
             # need to call func.func to get the original callable function name since created by partial()
             logger.fatal(
