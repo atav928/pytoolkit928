@@ -19,7 +19,3 @@ class TestReadYaml(unittest.TestCase):
 
     def test_get_var_dir(self):
         self.assertIs(type(get_var_dir()), str)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -45,7 +45,3 @@ class TestSplunk(unittest.TestCase):
         string: str = splunk.splunk_format(**sample_data)
         print("Converting Splunk Data Dictionary to a string format.")
         self.assertIsInstance(string, str)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -322,5 +322,5 @@ def snake_to_camel(name: str) -> str:
     :return: snake_case value.
     :rtype: str
     """
-    init, *temp = name.split('_')
-    return ''.join([init.lower(), *map(str.title, temp)])
+    init, *temp = name.split("_")
+    return "".join([init.lower(), *map(str.title, temp)])
