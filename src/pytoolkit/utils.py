@@ -312,6 +312,11 @@ def snake_to_camel(name: str) -> str:
     """
     Convert Snake Case into Camel Case.
 
+    Example:
+        >>> value="snake_format"
+        >>> snake_to_camel(value)
+        'snakeFormat'
+
     :param name: Value to convert to snake_case.
     :type name: str
     :return: snake_case value.
