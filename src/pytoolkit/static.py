@@ -66,3 +66,4 @@ NO_AIRPORTDATA = {
     "tz": None,
     "lid": None,
 }
+SPLUNK_HEC_EVENTPATH = "services/collector/event"
