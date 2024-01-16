@@ -270,9 +270,9 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(
+def sanatize_data(  # pylint: disable=W0102
     data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:  # pylint: disable=W0102
+) -> dict[str, Any]:
     """
     Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
@@ -309,7 +309,7 @@ def split(event_list: list[Any], chunk_size: int):
         yield event_list[i:i + chunk_size]
 
 # Lambda func for chunk for quick object
-chunk = lambda lst,n:[lst[i:i + n] for i in range(0, len(lst), n)]
+chunk: list[Any] = lambda lst,n:[lst[i:i + n] for i in range(0, len(lst), n)]  # pylint: disable=C3001
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     """
