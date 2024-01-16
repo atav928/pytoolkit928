@@ -14,6 +14,8 @@ import re
 from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
+pattern = re.compile(r"(?<!^)(?=[A-Z])")
+
 
 def os_plat() -> str:
     """
@@ -270,7 +272,7 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
 
 def sanatize_data(
     data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:
+) -> dict[str, Any]:  # pylint: disable=W0102
     """
     Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
@@ -287,3 +289,72 @@ def sanatize_data(
         for key, value in flat.items()
     }
     return nested_dict(new_dict)
+
+
+def split(event_list: list[Any], chunk_size: int):
+    """
+    Generator that yels n-sized chuncks.
+       Ex: list(split(range(0,300),10))
+             [[x,x,x,x,x],
+              [x,x,x,x,x]]
+
+    :param event_list: _description_
+    :type event_list: _type_
+    :param chunk_size: _description_
+    :type chunk_size: _type_
+    :yield: _description_
+    :rtype: _type_
+    """
+    for i in range(0, len(event_list), chunk_size):
+        yield event_list[i:i + chunk_size]
+
+# Lambda func for chunk for quick object
+chunk = lambda lst,n:[lst[i:i + n] for i in range(0, len(lst), n)]
+
+def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
+    """
+    Splits up events into chunks.
+
+    :param lst: _description_
+    :type lst: list[Any]
+    :param n: _description_
+    :type n: int
+    :return: _description_
+    :rtype: list[list[Any]]
+    """
+    return [lst[i:i + n] for i in range(0, len(lst), n)]
+
+
+def camel_to_snake(name: str):
+    """
+    Convert simple Camel to Snake case does not handle complex patterns.
+
+    Example:
+        >>> value = 'someValue'
+        >>> camel_to_snake(value)
+        `some_value`
+
+    :param name: Value to convert in camelCase.
+    :type name: str
+    :return: Snake case value.
+    :rtype: str
+    """
+    return pattern.sub("_", name).lower()
+
+
+def snake_to_camel(name: str) -> str:
+    """
+    Convert Snake Case into Camel Case.
+
+    Example:
+        >>> value="snake_format"
+        >>> snake_to_camel(value)
+        'snakeFormat'
+
+    :param name: Value to convert to snake_case.
+    :type name: str
+    :return: snake_case value.
+    :rtype: str
+    """
+    init, *temp = name.split("_")
+    return "".join([init.lower(), *map(str.title, temp)])
