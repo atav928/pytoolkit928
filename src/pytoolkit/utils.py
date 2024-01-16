@@ -383,3 +383,30 @@ def get_airport_info(airport_code: str) -> dict[str, Any]:
     :rtype: dict[str,Any]
     """
     return AIRPORTDATA[airport_code.upper()]
+
+
+def convert_list_to_dict(lst: list[str]) -> dict[str, str]:
+    """
+    Converts a list to a dictionary.
+
+    :param lst: List of strings.
+    :type lst: list[str]
+    :return: Converted list of strings as a Key: Value pair.
+    :rtype: dict
+    """
+    res_dct = map(lambda i: (lst[i], lst[i+1]), range(len(lst)-1)[::2])
+    return dict(res_dct)
+
+
+def convert_dict_to_string(_dict: dict[str, Any]) -> str:
+    """
+    Convert a dictionary into a string output.
+     Make sure the dictionary is not nested.
+     Use flattening function if it is.
+
+    :param _dict: Flattened Dictionary
+    :type _dict: dict[str, Any]
+    :return: string
+    :rtype: str
+    """
+    return ' '.join([f'{k} {v}' for k,v in _dict.items()])

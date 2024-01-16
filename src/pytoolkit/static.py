@@ -34,6 +34,8 @@ SANATIZE_KEYS = [
     "cert",
     "authorization",
     "auth",
+    "-p",
+    "-P",
 ]
 CONFIG_PATH = "{}/{}.{}"
 SSH_PORT = 22
