@@ -169,6 +169,13 @@ def get_config_location(
                 str(Path("/etc/appname/appconfig.yaml")),
                 str(Path("/Users/guest/Library/logs/appname/appconfig.yml"))
             ]
+        OR:
+            config_location = [
+                str(Path.joinpath(Path.home() / ".config/application.yaml")),
+                str(Path.joinpath(Path.home() / ".config/application.yml")),
+                str(Path("/etc/appname/appconfig.yaml")),
+                str(Path("/Users/guest/Library/logs/appname/appconfig.yml"))
+            ]
     :param config_location: _description_
     :type config_location: list[str]
     :return: _description_

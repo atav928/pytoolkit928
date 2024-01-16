@@ -1,5 +1,13 @@
 # Releases
 
+## v0.0.15
+
+* Removed SSH and Pamiko module; split over to another project.
+* Add chunk/split into splunk upload.
+
+## v0.0.14
+
+* __BUG:__ Import error.
 __Todo:__
 
 * Add import key option to SSH Client.
@@ -14,6 +22,7 @@ ory.
 
 * Fixed issue with regex that doesn't match correctly.
 * Added function to create ability to search for a configuraiton file based on passed ordered list of places to search for a configuration file to read.
+* Added remote ssh connector.
 
 ## v0.0.11
 

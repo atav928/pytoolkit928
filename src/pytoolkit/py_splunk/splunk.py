@@ -7,6 +7,7 @@ from typing import Any, Optional, Union
 import logging
 
 from dataclasses import dataclass
+import requests
 
 import urllib3
 import requests
@@ -16,6 +17,8 @@ from pytoolkit.utilities import BaseMonitor, NONETYPE
 from pytoolkit.utils import chunk, reformat_exception
 
 splunk_log = logging.getLogger(__name__)
+
+splunk_url = "{}//{}:{}"
 
 
 @dataclass
@@ -70,7 +73,7 @@ def splunk_hec_format(
         "host": host,
         "source": source,
         "sourcetype": sourcetype,
-        "events": {},
+        "event": {},
     }
     if metrics_list:
         # Build HEC Style Metrics
@@ -78,8 +81,8 @@ def splunk_hec_format(
             f"metric_name:{metric}": kwargs.pop(metric, None) for metric in metrics_list
         }
         hec_json["fields"] = dict(sorted(hec_json["fields"].items()))
-    hec_json["events"] = {**hec_json["events"], **kwargs}
-    hec_json["events"] = dict(sorted(hec_json["events"].items()))
+    hec_json["event"] = {**hec_json["event"], **kwargs}
+    hec_json["event"] = dict(sorted(hec_json["event"].items()))
     return hec_json
 
 

@@ -36,4 +36,34 @@ SANATIZE_KEYS = [
     "auth",
 ]
 CONFIG_PATH = "{}/{}.{}"
+SSH_PORT = 22
+DISABLED_ALGORITHMS = {
+    "ciphers": [
+        "aes128-cbc",
+        "aes192-cbc",
+        "aes256-cbc",
+        "3des-cbc",
+    ],
+    "macs": ["hmac-sha1", "hmac-md5", "hmac-sha1-96", "hmac-md5-96"],
+    "keys": ["ssh-dss", "ssh-rsa"],
+    "pubkeys": ["ssh-rsa", "ssh-dss"],
+    "kex": [
+        "diffie-hellman-group1-sha1",
+        "diffie-hellman-group14-sha1",
+        "diffie-hellman-group-exchange-sha1",
+    ],
+}
+NO_AIRPORTDATA = {
+    "icao": None,
+    "iata": None,
+    "name": None,
+    "city": None,
+    "subd": None,
+    "country": None,
+    "elevation": None,
+    "lat": None,
+    "lon": None,
+    "tz": None,
+    "lid": None,
+}
 SPLUNK_HEC_EVENTPATH = "services/collector/event"

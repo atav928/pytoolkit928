@@ -10,11 +10,18 @@ import socket
 from typing import Any, List, Union
 import base64
 import re
+import json
 
-from pytoolkit.static import ENCODING, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
+import airportsdata
+
+from pytoolkit.decorate import error_handler
+from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
-pattern = re.compile(r"(?<!^)(?=[A-Z])")
+PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
+AIRPORTDATA = json.loads(
+    json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False)
+)
 
 
 def os_plat() -> str:
@@ -131,6 +138,9 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
         ]
     )
 
+def reform_except(error: Exception):
+    """Shorter function call that calls `reformat_exception` Exception."""
+    return reformat_exception(error=error)
 
 def reformat_exception(error: Exception) -> str:
     """
@@ -270,9 +280,9 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(
+def sanatize_data(  # pylint: disable=W0102
     data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:  # pylint: disable=W0102
+) -> dict[str, Any]:
     """
     Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
@@ -310,7 +320,7 @@ def split(event_list: list[Any], chunk_size: int):
 
 
 # Lambda func for chunk for quick object
-chunk = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]
+chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]  # type: ignore # pylint: disable=C3001,line-too-long
 
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
@@ -341,7 +351,7 @@ def camel_to_snake(name: str):
     :return: Snake case value.
     :rtype: str
     """
-    return pattern.sub("_", name).lower()
+    return PATTERN.sub("_", name).lower()
 
 
 def snake_to_camel(name: str) -> str:
@@ -360,3 +370,16 @@ def snake_to_camel(name: str) -> str:
     """
     init, *temp = name.split("_")
     return "".join([init.lower(), *map(str.title, temp)])
+
+
+@error_handler(default_return=NO_AIRPORTDATA)
+def get_airport_info(airport_code: str) -> dict[str, Any]:
+    """
+    Extracts Airport Code from Airport Database using the `IATA` value.
+
+    :param airport_code: `IATA` airport code
+    :type airport_code: str
+    :return: Airport Information. Returns Emtpy Dictionary if not found or invalid
+    :rtype: dict[str,Any]
+    """
+    return AIRPORTDATA[airport_code.upper()]

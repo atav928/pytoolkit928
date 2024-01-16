@@ -38,8 +38,8 @@ class TestSplunk(unittest.TestCase):
             index="some_index",
             **sample_data,
         )
-        self.assertIsInstance(hec["events"], dict)
-        self.assertIs(hec["events"]["index"], "some_index")
+        self.assertIsInstance(hec["event"], dict)
+        self.assertIs(hec["event"]["index"], "some_index")
 
     def test_splunk_form(self) -> None:
         string: str = splunk.splunk_format(**sample_data)
