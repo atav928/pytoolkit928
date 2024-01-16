@@ -11,6 +11,7 @@ from pytoolkit.utilities import BaseMonitor, NONETYPE
 
 splunk_url = "{}//{}:{}"
 
+
 @dataclass
 class SplunkHecHeader(BaseMonitor):
     """Splunk Hec Header."""
@@ -75,6 +76,7 @@ def splunk_hec_format(
     hec_json["event"] = {**hec_json["event"], **kwargs}
     hec_json["event"] = dict(sorted(hec_json["event"].items()))
     return hec_json
+
 
 def splunk_upload(
     server: str,

@@ -15,8 +15,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(inet.convert_mac(mac=VALUE2), VALUE1)
         self.assertEqual(inet.convert_mac(mac=VALUE1, remove=True), VALUE2)
         self.assertRaises(ValueError, inet.convert_mac, VALUE3)
-        self.assertRaises(ValueError,inet.convert_mac,**{'mac': VALUE3,'remove': True})
+        self.assertRaises(
+            ValueError, inet.convert_mac, **{"mac": VALUE3, "remove": True}
+        )
         self.assertEqual(
             inet.convert_mac(mac=VALUE1, remove=True, to_lower=False), VALUE2.upper()
         )
-        self.assertRaises(ValueError,inet.convert_mac,**{'mac': VALUE3,'remove': True, 'split_by': 6})
+        self.assertRaises(
+            ValueError,
+            inet.convert_mac,
+            **{"mac": VALUE3, "remove": True, "split_by": 6},
+        )

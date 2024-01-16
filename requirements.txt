@@ -6,3 +6,4 @@ PyYaml
 pandas
 numpy>=1.22.2
 requests
+airportsdata>=20231230

@@ -53,3 +53,16 @@ DISABLED_ALGORITHMS = {
         "diffie-hellman-group-exchange-sha1",
     ],
 }
+NO_AIRPORTDATA = {
+    "icao": None,
+    "iata": None,
+    "name": None,
+    "city": None,
+    "subd": None,
+    "country": None,
+    "elevation": None,
+    "lat": None,
+    "lon": None,
+    "tz": None,
+    "lid": None,
+}
