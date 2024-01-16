@@ -112,3 +112,24 @@ __TOOD:__ Create a way to extract a CSV or XCEL file and turn it into a proper d
 __TODO:__ Add splunk HEC fromatter with proper chunck
 
 __TODO:__ KVSTORE configuration tool.
+
+### Utilities
+
+Sanatize dictionary data
+
+```python
+from pytoolkit.utils import sanatize_data
+
+test_dict = {
+    "value1": "one",
+    "value2": "two",
+    "subvalue01": {
+        "password": "welcome123",
+        "username": "testuser",
+    }
+}
+
+sanatized_dict = sanatize_data(data=test_dict)
+print(sanatize_dict)
+# {"value1": "one", "value2": "two", "subvalue01": { "password": "[MASKED]", "username": "testuser"}}
+```
