@@ -1,5 +1,10 @@
 # Releases
 
+## v0.0.15
+
+* Removed SSH and Pamiko module; split over to another project.
+* Add chunk/split into splunk upload.
+
 ## v0.0.14
 
 * __BUG:__ Import error.
