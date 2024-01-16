@@ -7,7 +7,6 @@ from typing import Any, Optional, Union
 import logging
 
 from dataclasses import dataclass
-import requests
 
 import urllib3
 import requests
