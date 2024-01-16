@@ -10,7 +10,8 @@ import tempfile
 
 import yaml
 
-from pytoolkit.static import (ENCODING, FILE_UMASK_PERMISSIONS, CONFIG_PATH)
+from pytoolkit.static import ENCODING, FILE_UMASK_PERMISSIONS, CONFIG_PATH
+
 
 class BytesDump(json.JSONEncoder):
     """Resovlve error with byte present in Dict."""
@@ -20,6 +21,7 @@ class BytesDump(json.JSONEncoder):
         if isinstance(o, bytes):
             return o.decode()
         return json.JSONEncoder.default(self, o)
+
 
 def get_config_section(filename: str, ftype: str, section: str = ""):
     """
@@ -38,6 +40,7 @@ def get_config_section(filename: str, ftype: str, section: str = ""):
     if section:
         settings = settings.get(section, {})
     return settings
+
 
 def read_yaml(filename: Path) -> dict[str, Any]:
     """
@@ -150,7 +153,12 @@ def check_file(filename: str) -> None:
     if not Path(filename).is_file():
         raise ValueError(f"Not a file {filename}")
 
-def get_config_location(config_location: list[str], app_name: Union[str, None] = None, file_format: str = "yml") -> str:
+
+def get_config_location(
+    config_location: list[str],
+    app_name: Union[str, None] = None,
+    file_format: str = "yml",
+) -> str:
     """
     Retrieve configuraiton lcoation if one exists in the paths to search.
 
@@ -168,8 +176,12 @@ def get_config_location(config_location: list[str], app_name: Union[str, None] =
     """
     for location in config_location:
         # TODO: Allow for diff types as currentlu just allowing yaml.
-        if Path.is_file(Path(
-            CONFIG_PATH.format(location,app_name, file_format) if app_name else location)
+        if Path.is_file(
+            Path(
+                CONFIG_PATH.format(location, app_name, file_format)
+                if app_name
+                else location
+            )
         ):
             return location
         return ""
