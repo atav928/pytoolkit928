@@ -28,6 +28,7 @@ def test_getfqdn():
         result = utils.return_hostinfo(fqdn=True)
         assert result == "server01.b100.example.com"
 
+
 def test_gethostname():
     # Create a mock object for the socket module
     with mock.patch("socket.gethostname") as mock_hostname:
@@ -36,6 +37,7 @@ def test_gethostname():
         result = utils.return_hostinfo(fqdn=False)
         print(result)
         assert result == "server01.b100"
+
 
 class TestStringMethods(unittest.TestCase):
     def test_os(self) -> None:
@@ -56,7 +58,6 @@ class TestStringMethods(unittest.TestCase):
         error = None  # type: ignore
         try:
             value: float = 1 / 0
-            print(value)
         except Exception as err:
             error: str = utils.reformat_exception(err)
             self.assertIsInstance(err, Exception, "exception passed")
@@ -109,6 +110,10 @@ class TestStringMethods(unittest.TestCase):
         print(result)
         self.assertIsNone(re.match(static.RE_DOMAIN, result))
 
+    def test_camel(self):
+        camel_case = "camelCase"
+        self.assertEqual(utils.camel_to_snake(camel_case), "camel_case")
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_snake(self):
+        snake_case = "snake_case"
+        self.assertEqual(utils.snake_to_camel(snake_case), "snakeCase")
