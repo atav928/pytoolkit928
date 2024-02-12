@@ -3,9 +3,8 @@
 
 from typing import Union, Any, Callable
 from functools import partial, wraps
-from inspect import signature
+from inspect import signature, isfunction
 import functools
-from inspect import isfunction
 import time
 import random
 import re
