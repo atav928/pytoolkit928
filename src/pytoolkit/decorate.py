@@ -2,14 +2,49 @@
 """Decorators."""
 
 from typing import Union, Any, Callable
-from functools import partial
+from functools import partial, wraps
 import functools
 from inspect import isfunction
 import time
 import random
 import re
+from dataclasses import fields
 
 from pytoolkit import decorator
+
+def _wrap_init(original_init):
+    @wraps(original_init)
+    def __init__(self, *args, **kwargs):
+        aliases = {}
+        for field in fields(self):
+            alias = field.metadata.get("alias")
+            if alias is not None:
+                value = kwargs.pop(alias)
+                aliases[field.name] = value
+
+        original_init(self, *args, **kwargs)
+
+        for name, value in aliases.items():
+            setattr(self, name, value)
+
+    return __init__
+
+def aliased(cls):
+    """
+    Alias wrapper when using a dataclass to alias a value that may be sent in differntly.
+    
+    Ex:
+        @aliased
+        @dataclass
+        class MyClass:
+            viewport: str = field(default="", metadata={"alias": "vp"})
+
+
+        mc = MyClass(vp="foo")
+    """
+    original_init = cls.__init__
+    cls.__init__ = _wrap_init(original_init)
+    return cls
 
 
 def __reform_except(error: Exception) -> str:
