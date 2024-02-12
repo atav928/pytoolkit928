@@ -13,6 +13,7 @@ from dataclasses import fields
 
 from pytoolkit import decorator
 
+
 # Dataclass Wrappers
 def _wrap_init(original_init):
     @wraps(original_init)
@@ -31,10 +32,11 @@ def _wrap_init(original_init):
 
     return __init__
 
+
 def aliased(cls):
     """
     Alias wrapper when using a dataclass to alias a value that may be sent in differntly.
-    
+
     Ex:
         @aliased
         @dataclass
@@ -48,6 +50,7 @@ def aliased(cls):
     cls.__init__ = _wrap_init(original_init)
     return cls
 
+
 def add_from_kwargs(cls) -> Any:
     """
     Wrapper to add new attributes into a dataclass.
@@ -58,7 +61,7 @@ def add_from_kwargs(cls) -> Any:
         @dataclass
         class NewData:
             name: str
-        
+
         params = {"name": "John", "age": 41}
         n = NewData.from_kwargs(**params)
         >>> print(n.age)
@@ -67,6 +70,7 @@ def add_from_kwargs(cls) -> Any:
     :return: _description_
     :rtype: Any
     """
+
     def from_kwargs(cls, **kwargs) -> Any:
         cls_fields: set[str] = {f for f in signature(cls).parameters}
         # split the kwargs into native ones and new ones
@@ -81,8 +85,10 @@ def add_from_kwargs(cls) -> Any:
         for new_name, new_val in new_args.itesm():
             setattr(ret, new_name, new_val)
         return ret
+
     cls.from_kwargs = classmethod(from_kwargs)
     return cls
+
 
 # Error Handling Wrappers
 def __reform_except(error: Exception) -> str:

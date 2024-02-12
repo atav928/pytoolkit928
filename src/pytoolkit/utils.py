@@ -138,9 +138,11 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
         ]
     )
 
+
 def reform_except(error: Exception):
     """Shorter function call that calls `reformat_exception` Exception."""
     return reformat_exception(error=error)
+
 
 def reformat_exception(error: Exception) -> str:
     """
@@ -394,7 +396,7 @@ def convert_list_to_dict(lst: list[str]) -> dict[str, str]:
     :return: Converted list of strings as a Key: Value pair.
     :rtype: dict
     """
-    res_dct = map(lambda i: (lst[i], lst[i+1]), range(len(lst)-1)[::2])
+    res_dct = map(lambda i: (lst[i], lst[i + 1]), range(len(lst) - 1)[::2])
     return dict(res_dct)
 
 
@@ -409,4 +411,4 @@ def convert_dict_to_string(_dict: dict[str, Any]) -> str:
     :return: string
     :rtype: str
     """
-    return ' '.join([f'{k} {v}' for k,v in _dict.items()])
+    return " ".join([f"{k} {v}" for k, v in _dict.items()])

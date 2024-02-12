@@ -10,7 +10,8 @@ from unittest import mock
 from pytoolkit import utils
 from pytoolkit import static
 
-SANTIZE_DATA = {'password': 'welcome123', 'username': 'testuser'}
+SANTIZE_DATA = {"password": "welcome123", "username": "testuser"}
+
 
 def patch_getfqdn(func):
     @functools.wraps(func)
@@ -124,38 +125,44 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(utils.snake_to_camel(snake_case), "snakeCase")
 
     def test_airport_codes(self):
-        valid = 'jfk'
-        invalid = 'att'
+        valid = "jfk"
+        invalid = "att"
         valid_response = utils.get_airport_info(valid)
         invalid_response = utils.get_airport_info(invalid)
-        self.assertEqual(valid_response['iata'],'JFK')
-        self.assertEqual(valid_response['country'],'US')
-        self.assertIsNone(invalid_response['country'])
-        self.assertIsInstance(valid_response,dict)
-        self.assertIsInstance(invalid_response,dict)
+        self.assertEqual(valid_response["iata"], "JFK")
+        self.assertEqual(valid_response["country"], "US")
+        self.assertIsNone(invalid_response["country"])
+        self.assertIsInstance(valid_response, dict)
+        self.assertIsInstance(invalid_response, dict)
 
     def test_chunk(self):
-        mock_hec_data = [{'empty': 'dict','for': 'testing', 'value': x} for x in range(200)]
-        chunk_data = utils.chunk_func(mock_hec_data,100)
-        self.assertEqual(len(chunk_data),2,'Data has been chunked into two arrays')
-        self.assertEqual(len(chunk_data[1]),100,'Confirmed data was split into 100 events in series 2')
-        chunk_data = utils.chunk(mock_hec_data,50)
-        self.assertEqual(len(chunk_data),4,'Lamda function split data into 4 series')
+        mock_hec_data = [
+            {"empty": "dict", "for": "testing", "value": x} for x in range(200)
+        ]
+        chunk_data = utils.chunk_func(mock_hec_data, 100)
+        self.assertEqual(len(chunk_data), 2, "Data has been chunked into two arrays")
+        self.assertEqual(
+            len(chunk_data[1]),
+            100,
+            "Confirmed data was split into 100 events in series 2",
+        )
+        chunk_data = utils.chunk(mock_hec_data, 50)
+        self.assertEqual(len(chunk_data), 4, "Lamda function split data into 4 series")
 
     def test_split(self):
-        values = list(utils.split(range(0,300),10))
-        self.assertEqual(len(values),300/10,'Split function split events out by 30')
+        values = list(utils.split(range(0, 300), 10))
+        self.assertEqual(len(values), 300 / 10, "Split function split events out by 30")
 
     def test_sanatize(self):
         new_dict = utils.sanatize_data(data=SANTIZE_DATA)
-        self.assertEqual(new_dict['password'], '[MASKED]')
-        self.assertNotEqual(new_dict['password'],SANTIZE_DATA['password'])
+        self.assertEqual(new_dict["password"], "[MASKED]")
+        self.assertNotEqual(new_dict["password"], SANTIZE_DATA["password"])
 
     def test_verify_list(self):
-        test_str = 'one,two,three'
-        test_lst = ['one',2,'three']
+        test_str = "one,two,three"
+        test_lst = ["one", 2, "three"]
         new_str = utils.verify_list(test_str)
         new_lst = utils.verify_list(test_lst)
-        self.assertEqual(test_lst,new_lst,'List unchanged')
-        self.assertIsInstance(new_str,list,'Converted string to a list')
-        self.assertRaises(ValueError,utils.verify_list,{'object':'not-a-list'})
+        self.assertEqual(test_lst, new_lst, "List unchanged")
+        self.assertIsInstance(new_str, list, "Converted string to a list")
+        self.assertRaises(ValueError, utils.verify_list, {"object": "not-a-list"})
