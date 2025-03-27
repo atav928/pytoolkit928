@@ -22,9 +22,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10"
 ]
 dynamic = ["version", "readme", "dependencies","description"]
+keywords = ["utilities", "splunk", "dataclasses", "toolkit"]
 
 [project.urls]
-homepage = "https://github.com/atav928/pytoolkit"
+Homepage = "https://www.tavnets.com/blog/python-toolkit/"
+Repository = "https://github.com/atav928/pytoolkit"
+Changelog = "https://github.com/atav928/pytoolkit928/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 test = [

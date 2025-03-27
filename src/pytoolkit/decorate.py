@@ -2,16 +2,94 @@
 """Decorators."""
 
 from typing import Union, Any, Callable
-from functools import partial
+from functools import partial, wraps
+from inspect import signature, isfunction
 import functools
-from inspect import isfunction
 import time
 import random
 import re
+from dataclasses import fields
 
 from pytoolkit import decorator
 
 
+# Dataclass Wrappers
+def _wrap_init(original_init):
+    @wraps(original_init)
+    def __init__(self, *args, **kwargs):
+        aliases = {}
+        for field in fields(self):
+            alias = field.metadata.get("alias")
+            if alias is not None:
+                value = kwargs.pop(alias)
+                aliases[field.name] = value
+
+        original_init(self, *args, **kwargs)
+
+        for name, value in aliases.items():
+            setattr(self, name, value)
+
+    return __init__
+
+
+def aliased(cls):
+    """
+    Alias wrapper when using a dataclass to alias a value that may be sent in differntly.
+
+    Ex:
+        @aliased
+        @dataclass
+        class MyClass:
+            viewport: str = field(default="", metadata={"alias": "vp"})
+
+
+        mc = MyClass(vp="foo")
+    """
+    original_init = cls.__init__
+    cls.__init__ = _wrap_init(original_init)
+    return cls
+
+
+def add_from_kwargs(cls) -> Any:
+    """
+    Wrapper to add new attributes into a dataclass.
+
+    Ex:
+        ```
+        @add_from_kwargs
+        @dataclass
+        class NewData:
+            name: str
+
+        params = {"name": "John", "age": 41}
+        n = NewData.from_kwargs(**params)
+        >>> print(n.age)
+        41
+        ```
+    :return: _description_
+    :rtype: Any
+    """
+
+    def from_kwargs(cls, **kwargs) -> Any:
+        cls_fields: set[str] = {f for f in signature(cls).parameters}
+        # split the kwargs into native ones and new ones
+        native_args, new_args = {}, {}
+        for name, val in kwargs.items():
+            if name in cls_fields:
+                native_args[name] = val
+                continue
+            new_args[name] = val
+        # add the new values by hand
+        ret = cls(**native_args)
+        for new_name, new_val in new_args.itesm():
+            setattr(ret, new_name, new_val)
+        return ret
+
+    cls.from_kwargs = classmethod(from_kwargs)
+    return cls
+
+
+# Error Handling Wrappers
 def __reform_except(error: Exception) -> str:
     """
     Reformates Exception to print out as a string pass for logging.

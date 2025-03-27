@@ -191,4 +191,4 @@ def get_config_location(
             )
         ):
             return location
-        return ""
+    return ""

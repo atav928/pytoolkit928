@@ -115,18 +115,18 @@ def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
     if not verify:
         log.error(f'msg="SSL Verficiation is off recommended this be fixed"|{verify=}')
         urllib3.disable_warnings  # pylint: disable=pointless-statement
-    url = f"https://{server}:{port}/{SPLUNK_HEC_EVENTPATH}"
-    headers = {
+    url: str = f"https://{server}:{port}/{SPLUNK_HEC_EVENTPATH}"
+    headers: dict[str, str] = {
         "Content-Type": "application/json",
         "Authorization": f"Splunk {token}",
         "X-Splunk-Request-Channel": token,
     }
-    chunk_data: list[list[Any]] = (
+    chunk_data: list[list[dict[str,Any]]] = (
         chunk(hec_data, chunk_size) if len(hec_data) > chunk_size > 0 else [hec_data]
     )
     resp_list: list[dict[str, Any]] = []
     for payload in chunk_data:
-        response = requests.post(
+        response: requests.Response = requests.post(
             url, headers=headers, json=payload, verify=verify, timeout=timeout
         )
         splunk_log.info(
@@ -144,6 +144,6 @@ def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
         except Exception as err:
             error = reformat_exception(err)
             splunk_log.error(
-                f'msg="Unable to upload datea to splunk server"|splunk_server={server}, {error=}'
+                f'msg="Unable to upload data to splunk server"|splunk_server={server}, {error=}'
             )
     return resp_list
