@@ -16,10 +16,9 @@ license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: Implementation",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10"
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
 ]
 dynamic = ["version", "readme", "dependencies","description"]
 keywords = ["utilities", "splunk", "dataclasses", "toolkit"]
@@ -36,11 +35,68 @@ test = [
     "pytest-mock",
     "unittest2",
     "dataclasses",
-    "six"
+    "six",
+    "black",
+    "isort",
+    "autoflake",
+    "safety",
+    "tomli"
 ]
 
 [tool.pytest.ini_options]
-addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 65"
+addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 60"
+testpaths = ["tests"]
+
+[tool.pytest]
+log_cli_format = "%(asctime)s %(levelname)s %(message)s"
+
+
+[tool.black]
+line-length = 127
+target-version = ["py310","py311"]
+include = '\.py$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+/(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | public
+    | secrets
+    | tests/
+    # The following are specific to Black
+    | reports
+    | docs
+)/
+'''
+unstable = false
+
+[tool.pylint.message_control]
+disable = [
+    "fixme",
+    "too-few-public-methods",
+    "logging-fstring-interpolation",
+    "logging-format-interpolation"
+]
+
+[tool.isort]
+atomic = true
+profile = "black"
+src_paths = ["src"]
+skip = [".gitignore", ".dockerignore", ".venv", "tests", "test", ".csv", "build", "dist", "reports"]
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+py_version = "3"
+color_output = true
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}

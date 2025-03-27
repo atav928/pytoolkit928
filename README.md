@@ -1,8 +1,33 @@
 # PyToolkit
 
-Python General tools
+Python General tools.
+
+**Table of Contents:**
+1. [Installation](#installation)
+2. [Utilities](#utilities)
+   1. [Manipulating Strings](#manipulating-strings)
+      1. [String to List](#string-to-list)
+      2. [Camel and Snake Cases](#camel-and-snake-cases)
+   2. [Dataclass Base](#dataclass-base)
+   3. [Maniuplating Dictionaries](#maniuplating-dictionaries)
+      1. [Search Utilities](#search-utilities)
+   4. [Files](#files)
+
+## Installation
+
+Source: [https://pypi.org/project/pytoolkit928/](https://pypi.org/project/pytoolkit928/)
+
+```bash
+>>> python -m pip install pytoolkit928
+```
 
 ## Utilities
+
+**NOTE:** There are 2 utils files that will be fixed in later releases. Currently `pyoolkit.utils` holds basic utilities and `pytoolkit.utilities` holds primarily dataclass and dict reformat utilities.
+
+### Manipulating Strings
+
+#### String to List
 
 `string_or_list` function allows you to interpret a string and return a list. Provides you the option of adding a delimeter using an OR function to return a possible string that you may be expecting possible commond delimeters. Such as: `",|:|\|, "`.
 
@@ -18,6 +43,31 @@ __Example:__
 ['string1', 'string2', 'string3|string4']
 >>> string_or_list(test,delimeters=',| |\|')
 ['string1', 'string2', 'string3', 'string4']
+```
+
+#### Camel and Snake Cases
+
+**Camel_to_Snake Case:**
+
+Converts camelCase into snake_case values. This funcition uses regular expressions to also handle `special characters` found in some non-standard formats.
+
+```bash
+>>> from pytoolkit.utils import camel_to_snake
+>>> camel_to_snake(name='someValue.1')
+'some_value1'
+# To use a list of values and return them use `output='list'`
+>>> camel_to_snake(name=['someValue.1', 'someValue', 'nextValue', 'lastTimeModifiedValue'], output='list')
+['some_value1', 'some_value', 'next_value', 'last_time_modified_value']
+```
+
+**Snake_to_Camel Case:**
+
+Converts snake_case values into camelCase.
+
+```bash
+>>> from pytoolkit.utils import snake_to_camel
+>>> snake_to_camel(name='last_time_modified_value')
+'lastTimeModifiedValue
 ```
 
 ### Dataclass Base
@@ -113,9 +163,8 @@ __TODO:__ Add splunk HEC fromatter with proper chunck
 
 __TODO:__ KVSTORE configuration tool.
 
-### Utilities
 
-Sanatize dictionary data
+**Sanatize dictionary data**
 
 ```python
 from pytoolkit.utils import sanatize_data
@@ -132,4 +181,44 @@ test_dict = {
 sanatized_dict = sanatize_data(data=test_dict)
 print(sanatize_dict)
 # {"value1": "one", "value2": "two", "subvalue01": { "password": "[MASKED]", "username": "testuser"}}
+```
+
+#### Search Utilities
+
+`extract_matches` function allows you to extract matches and non matches from a list of strings using a conditional function.
+
+__Sample Code:__
+
+```python
+from datetime import datetime, timezone, timedelta
+
+from pytoolkit.utilities import extract_matches
+
+# This function searches for data that is extracted from a file into a list and does a compare of the datetime to match values in a dataframe that are older than a certain time.
+m = extract_matches(iterable=m.matches, condition=lambda x: [bool(datetime.strptime(str(x.stem).split('_', maxsplit=1)[-1],'%Y%m%dT%H%M') < datetime.now(timezone.utc) - timedelta(days=days))])
+
+```
+
+The aove code passes a `lambda` function that allows you to create a single or list of conditions that each line is used to search and return a match and non-match dataclass which can be exported using:
+
+```python
+m.match
+m.no_match
+```
+
+### Files
+
+Reads different file types:
+
+* yaml
+* json
+* csv
+* text
+* ini
+
+Read in files and manipulate them using standard functions and `pandas` library.
+
+```python
+from pytoolkit.files import readfile
+
 ```

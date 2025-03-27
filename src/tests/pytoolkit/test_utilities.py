@@ -2,21 +2,20 @@
 """Test Utilities to Import."""
 import re
 import unittest
+from dataclasses import dataclass
+from typing import Any, Hashable, Optional, Union
 from unittest import mock
 from unittest.mock import mock_open
-from typing import Any, Optional, Union, Hashable
 
-from dataclasses import dataclass
-
+from pytoolkit.static import NONETYPE
 from pytoolkit.utilities import (
-    nested_dict,
+    BaseMonitor,
+    extract_matches,
     flatten_dict,
     flatten_dictionary,
-    BaseMonitor,
+    nested_dict,
     set_bool,
-    extract_matches,
 )
-from pytoolkit.static import NONETYPE
 
 test_nest_dict: dict[str, Union[str, dict[str, str]]] = {
     "key1": "value",
@@ -57,9 +56,7 @@ class TestDictionaries(unittest.TestCase):
         self.assertIsInstance(converted["metadata"], dict)
 
     def test_flat(self) -> None:
-        print(
-            "Running tests against Converting a Nested dictionary to a Flattened Dict."
-        )
+        print("Running tests against Converting a Nested dictionary to a Flattened Dict.")
         converted: dict[str, Any] = flatten_dict(test_nest_dict)
         for v in converted.values():
             self.assertIsInstance(v, str)

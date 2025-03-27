@@ -1,8 +1,8 @@
 # pylint: disable=missing-function-docstring,missing-class-docstring
 """Test Utilities."""
 
-from typing import Any
 import unittest
+from typing import Any
 
 from pytoolkit.py_splunk import splunk
 

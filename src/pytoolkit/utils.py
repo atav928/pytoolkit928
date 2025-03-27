@@ -1,16 +1,16 @@
 # pylint: disable=broad-exception-caught
 """Utilities."""
 
-from enum import Enum
+import base64
+import json
 import os
-from pathlib import Path
 import platform
 import pwd
-import socket
-from typing import Any, List, Union
-import base64
 import re
-import json
+import socket
+from enum import Enum
+from pathlib import Path
+from typing import Any, List, Union
 
 import airportsdata
 
@@ -19,9 +19,7 @@ from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATI
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
 PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
-AIRPORTDATA = json.loads(
-    json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False)
-)
+AIRPORTDATA = json.loads(json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False))
 
 
 def os_plat() -> str:
@@ -93,7 +91,7 @@ def enum(*sequential: Any, **named: Any) -> type[Enum]:
 def isstring(arg: Any) -> bool:
     """Verifies if an argument is a string."""
     try:
-        return isinstance(arg, basestring)
+        return isinstance(arg, basestring)  # type: ignore
     except NameError:
         return isinstance(arg, (str, bytes))
 
@@ -127,10 +125,7 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return (
-            re.split(delimeters, value,
-                     flags=re.IGNORECASE) if delimeters else [value]
-        )
+        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
     return (
         list(value)
         if "__iter__" in dir(value)
@@ -253,11 +248,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return (
-            ".".join(host.split(".")[:-2])
-            if ".".join(host.split(".")[:-2]) != ""
-            else ".".join(host.split(".")[:-1])
-        )
+        return ".".join(host.split(".")[:-2]) if ".".join(host.split(".")[:-2]) != "" else ".".join(host.split(".")[:-1])
     return host
 
 
@@ -283,11 +274,9 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(  # pylint: disable=W0102
-    data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:
+def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
     """
-    Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
     :param data: _description_
     :type data: dict[str,Any]
@@ -297,11 +286,7 @@ def sanatize_data(  # pylint: disable=W0102
     :rtype: dict[str, Any]
     """
     flat = flatten_dictionary(data)
-    new_dict = {
-        key: "[MASKED]" if isinstance(
-            key, str) and key.lower() in keys else value
-        for key, value in flat.items()
-    }
+    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
     return nested_dict(new_dict)
 
 
@@ -320,13 +305,12 @@ def split(event_list: list[Any], chunk_size: int):
     :rtype: _type_
     """
     for i in range(0, len(event_list), chunk_size):
-        yield event_list[i: i + chunk_size]
+        yield event_list[i : i + chunk_size]
 
 
 # Lambda func for chunk for quick object
 # type: ignore # pylint: disable=C3001,line-too-long
-chunk: list[Any] = lambda lst, n: [lst[i: i + n]
-                                   for i in range(0, len(lst), n)]
+chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
@@ -340,24 +324,41 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     :return: _description_
     :rtype: list[list[Any]]
     """
-    return [lst[i: i + n] for i in range(0, len(lst), n)]
+    return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
-def camel_to_snake(name: str):
+def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
     """
-    Convert simple Camel to Snake case does not handle complex patterns.
+    Convert a complex Camel to Snake case does not handle complex patterns.
+    Manages more complex patterns when the original CamelCase is not written correctly.
+    ie. When a `.` is introduced or another `special char`.
 
     Example:
-        >>> value = 'someValue'
+        >>> value = 'someValue.1'
         >>> camel_to_snake(value)
-        `some_value`
+        `some_value1`
 
     :param name: Value to convert in camelCase.
     :type name: str
+    :param output: Type of output. Default `str`
+    :type output: str
     :return: Snake case value.
-    :rtype: str
+    :rtype: str | List[str]
     """
-    return PATTERN.sub("_", name).lower()
+    # TODO: convert to precompiled patterns
+    names: List[str] = string_or_list(name)
+    snake_case: List[str] = []
+    for n in names:
+        # Handle any unusual characters select option on how to handle
+        n: str = re.sub(r"\ |\.|\|\,|", "", n)
+        n = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", n)
+        n = re.sub("([a-z0-9])([A-Z])", r"\1_\2", n).lower()
+        snake_case.append(n)
+    if output in ["list"]:
+        # Returns a List of Snake formated strings. Defaults to string
+        return snake_case
+    # Returns a string value
+    return ",".join(snake_case)
 
 
 def snake_to_camel(name: str) -> str:
@@ -374,6 +375,7 @@ def snake_to_camel(name: str) -> str:
     :return: snake_case value.
     :rtype: str
     """
+    # TODO: add `output='list'` param to return a list of camelCase names
     init, *temp = name.split("_")
     return "".join([init.lower(), *map(str.title, temp)])
 
@@ -416,6 +418,7 @@ def convert_dict_to_string(_dict: dict[str, Any]) -> str:
     :rtype: str
     """
     return " ".join([f"{k} {v}" for k, v in _dict.items()])
+
 
 # Algorithms
 
@@ -483,7 +486,7 @@ def merge(left: list[Any], right: list[Any]):
     :rtype: _type_
     """
     result: list[Any] = []
-    while (left and right):
+    while left and right:
         if left[0] < right[0]:
             result.append(left[0])
             left.pop(0)
