@@ -252,26 +252,28 @@ def return_hostinfo(fqdn: bool = True) -> str:
     return host
 
 
-def set_bool(value: str, default: bool = False) -> Union[str, bool]:
-    """sets bool value when pulling string from os env
-
-    Args:
-        value (str|bool, Required): the value to evaluate
-        default (bool): default return bool value. Default False
-
-    Returns:
-        (str|bool): String if certificate path is passed otherwise True|False
+def set_bool(value: Union[str,int,float], default: bool = False) -> Union[str, bool]:
     """
-    value_bool = default
-    if isinstance(value, bool):
-        value_bool = value
-    elif str(value).lower() == "true":
-        value_bool = True
-    elif str(value).lower() == "false":
-        value_bool = False
-    elif Path.exists(Path(value)):
-        value_bool = value
-    return value_bool
+    sets bool value when pulling string from os env
+
+    :param value: the value to evaluate
+    :type value: str|int|float
+    :param default:  default return bool value, defaults to False
+    :type default: bool, optional
+    :return: String if `value` is a file otherwise bool(True|False)
+    :rtype: Union[str, bool]
+    """
+    from distutils.util import strtobool
+    if isinstance(value, str):
+        if Path.exists(Path(value)):
+            return value
+        try:
+            return bool(strtobool(value))
+        except:
+            return False
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return default
 
 
 def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102

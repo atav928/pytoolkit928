@@ -8,7 +8,7 @@ from pathlib import Path
 import certifi
 
 from pytoolkit.static import ENCODING, PEM_REGEX, TMP_PEM_POSTFIX
-from pytoolkit.utils import check_file, return_filelines, string_or_list
+from pytoolkit.utilities.utils import check_file, return_filelines, string_or_list
 
 
 def create_custom_cert(certstore: list[str]) -> tuple[str, list[str]]:

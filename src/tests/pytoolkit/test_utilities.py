@@ -8,14 +8,14 @@ from unittest import mock
 from unittest.mock import mock_open
 
 from pytoolkit.static import NONETYPE
-from pytoolkit.utilities import (
+from pytoolkit.utilities.pkg_utils import (
     BaseMonitor,
     extract_matches,
-    flatten_dict,
+    flatten_dict_legacy,
     flatten_dictionary,
     nested_dict,
-    set_bool,
 )
+from pytoolkit.utilities.utils import set_bool
 
 test_nest_dict: dict[str, Union[str, dict[str, str]]] = {
     "key1": "value",
@@ -57,7 +57,7 @@ class TestDictionaries(unittest.TestCase):
 
     def test_flat(self) -> None:
         print("Running tests against Converting a Nested dictionary to a Flattened Dict.")
-        converted: dict[str, Any] = flatten_dict(test_nest_dict)
+        converted: dict[str, Any] = flatten_dict_legacy(test_nest_dict)
         for v in converted.values():
             self.assertIsInstance(v, str)
             self.assertIsNot(v, dict)
@@ -70,7 +70,7 @@ class TestDictionaries(unittest.TestCase):
             self.assertIsNot(v, dict)
 
     def test_dataclass(self) -> None:
-        print("Running tests against BaseMonitor Dataclass")
+        """Running tests against BaseMonitor Dataclass"""
         base_dc = TestDataClass.create_from_dict(test_dataclass)
         base_dc_opt = TestDataClass.create_from_dict(test_dataclass_opt)
         self.assertIs(base_dc.sample, "sample_text", f"Base DC is {base_dc.to_dict()}")
@@ -80,13 +80,13 @@ class TestDictionaries(unittest.TestCase):
     @mock.patch("builtins.open", mock_open(read_data="data"))
     @mock.patch("pathlib.Path.exists")
     def test_set_bool(self, patched_isfile) -> None:
-        print("Testing Yaml Read.")
+        """Testing Yaml Read"""
         # valid file case
         patched_isfile.return_value = True
         result = set_bool("some_file.yaml")
         self.assertEqual(result, "some_file.yaml")
-        self.assertTrue(set_bool("t"))
-        self.assertFalse(set_bool("n"))
+        self.assertTrue(set_bool("t"), f"Expected a `True` return when running `set_bool('t')`")
+        self.assertFalse(set_bool(0), f"Expected a `False` return when running `set_bool(0)`")
 
     def test_extract(self):
         regex = r"two"

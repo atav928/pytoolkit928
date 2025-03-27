@@ -7,7 +7,8 @@ import unittest
 from enum import Enum
 from unittest import mock
 
-from pytoolkit import static, utils
+from pytoolkit import static
+from pytoolkit.utilities import utils
 
 SANTIZE_DATA = {"password": "welcome123", "username": "testuser"}
 
@@ -93,14 +94,22 @@ class TestStringMethods(unittest.TestCase):
         print(f"Testing hostname value {hostname}.")
         self.assertIsInstance(hostname, str)
 
-    def test_bool(self) -> None:
-        values = ["true", "false", True, False]
+    def test_bool_true(self) -> None:
+        """Test bool returns `True`"""
+        values = ["true", "t", True, 1, "yes", "y"]
         for v in values:
-            print(f"Testing if {v} is True/False")
             self.assertIsInstance(utils.set_bool(v), bool, f"Value {v} is a bool")
-        values = "/path/to/certificate"
-        print(f"Testing if location will return from {values}")
-        self.assertIsNot(utils.set_bool(values), True)
+
+    def test_bool_false(self) -> None:
+        """Test bool returns `False`"""
+        values = ["f", "false", "n", "no", 0, False]
+        for v in values:
+            self.assertFalse(utils.set_bool(v), f"Value {v} is not `False`")
+
+    def test_bool_path(self):
+        """Validate a non existing path returns false"""
+        value = "/path/to/certificate"
+        self.assertIsNot(utils.set_bool(value), True, f"Location will return `Fase` from {value}")
 
     def test_enum(self) -> None:
         print("Testing Enumaration Function.")
