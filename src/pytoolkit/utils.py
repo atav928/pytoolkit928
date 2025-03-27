@@ -305,11 +305,13 @@ def split(event_list: list[Any], chunk_size: int):
     :rtype: _type_
     """
     for i in range(0, len(event_list), chunk_size):
-        yield event_list[i : i + chunk_size]
+        yield event_list[i: i + chunk_size]
 
 
 # Lambda func for chunk for quick object
-chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]  # type: ignore # pylint: disable=C3001,line-too-long
+# type: ignore # pylint: disable=C3001,line-too-long
+chunk: list[Any] = lambda lst, n: [lst[i: i + n]
+                                   for i in range(0, len(lst), n)]
 
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
@@ -323,7 +325,7 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     :return: _description_
     :rtype: list[list[Any]]
     """
-    return [lst[i : i + n] for i in range(0, len(lst), n)]
+    return [lst[i: i + n] for i in range(0, len(lst), n)]
 
 
 def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
@@ -417,3 +419,82 @@ def convert_dict_to_string(_dict: dict[str, Any]) -> str:
     :rtype: str
     """
     return " ".join([f"{k} {v}" for k, v in _dict.items()])
+
+# Algorithms
+
+
+def swap(arr: list[Any], left_pos, right_pos):
+    """
+    A Python function that swaps two adjacent values in a list.
+
+    :param arr: _description_
+    :type arr: _type_
+    :param left_pos: _description_
+    :type left_pos: _type_
+    :param right_pos: _description_
+    :type right_pos: _type_
+    """
+    tmp = arr[left_pos]
+    arr[left_pos] = arr[right_pos]
+    arr[right_pos] = tmp
+
+
+def bubble_sort(arr: list[Any]):
+    """
+    The Bubble Sort algorithm is a simple algorithm to sort a list of N numbers in ascending order. Bubble sort works by iterating through a list and checking whether the current element is larger or smaller than the next element.
+    The Bubble Sort algorithm utilizes two loops: an outer loop to iterate over each element in the input list, and an inner loop to iterate, compare and exchange a pair of values in the list. The inner loop takes (N-1) iterations while the outer loop takes N iterations. Hence, the Big-O runtime for the algorithm is the product of O(N) and O(N-1), which is O(N^2).
+
+    :param arr: _description_
+    :type arr: list[Any]
+    """
+    for _ in arr:
+        for idx in range(len(arr) - 1):
+            if arr[idx] > arr[idx + 1]:
+                swap(arr, idx, idx + 1)
+
+
+def merge_sort(lst: list[Any]) -> list[Any]:
+    """
+    Merge Sort is a divide and conquer algorithm. It consists of two parts:
+    1) splitting the original list into smaller sorted lists recursively until there is only 1 element in the list,
+    2) merging back the presorted 1-element lists into 2-element lists, 4-element lists, and so on recursively.
+
+    :param lst: _description_
+    :type lst: list[Any]
+    :return: _description_
+    :rtype: _type_
+    """
+    if len(lst) <= 1:
+        return lst
+    middle: int = len(lst) // 2
+    left: List[Any] = lst[:middle]
+    right: List[Any] = lst[middle:]
+    sleft: List[Any] = merge_sort(left)
+    sright: List[Any] = merge_sort(right)
+    return merge(sleft, sright)
+
+
+def merge(left: list[Any], right: list[Any]):
+    """
+    The Merge Sort algorithm is divided into two parts. The first part repeatedly splits the input list into smaller lists to eventually produce single-element lists. The best, worst and average runtime for this part is Θ(log N). The second part repeatedly merges and sorts the single-element lists to twice its size until the original input size is achieved. The best, worst and average runtime for this part is Θ(N). Therefore, the combined runtime is Θ(N log N).
+
+    :param left: _description_
+    :type left: _type_
+    :param right: _description_
+    :type right: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    result: list[Any] = []
+    while (left and right):
+        if left[0] < right[0]:
+            result.append(left[0])
+            left.pop(0)
+        else:
+            result.append(right[0])
+            right.pop(0)
+    if left:
+        result += left
+    if right:
+        result += right
+    return result

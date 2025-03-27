@@ -125,13 +125,17 @@ class TestStringMethods(unittest.TestCase):
 
     def test_airport_codes(self):
         valid = "jfk"
-        invalid = "att"
         valid_response = utils.get_airport_info(valid)
-        invalid_response = utils.get_airport_info(invalid)
         self.assertEqual(valid_response["iata"], "JFK")
+        self.assertEqual(valid_response["city"], "New York")
         self.assertEqual(valid_response["country"], "US")
-        self.assertIsNone(invalid_response["country"])
         self.assertIsInstance(valid_response, dict)
+
+    def test_airport_codes_invalid(self):
+        invalid = "invalid"
+        invalid_response = utils.get_airport_info(invalid)
+        print(invalid_response)
+        self.assertIsNone(invalid_response["country"])
         self.assertIsInstance(invalid_response, dict)
 
     def test_chunk(self):
