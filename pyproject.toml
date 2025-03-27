@@ -106,7 +106,7 @@ description = {file = "DESCRIPTION"}
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["pytoolkit*"]
-exclude = ["*.xml"]
+exclude = ["*.xml", "tests/*"]
 namespaces = true
 
 [tool.coverage.run]
