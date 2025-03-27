@@ -39,7 +39,8 @@ test = [
     "isort",
     "autoflake",
     "safety",
-    "tomli"
+    "tomli",
+    "pylint"
 ]
 
 [tool.pytest.ini_options]
@@ -115,3 +116,4 @@ exclude = ["tests", "test"]
 
 [tool.pylint]
 max-line-length = 127
+ignore-paths='^src/tests/.*$'
