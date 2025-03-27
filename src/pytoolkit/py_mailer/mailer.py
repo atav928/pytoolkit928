@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from typing import List, Union
 
 from pytoolkit.static import DEFAULT_BCC, DEFAULT_CC, DEFAULT_FROM, DEFAULT_TO, ENCODING
-from pytoolkit.utils import string_or_list
+from pytoolkit.utilities.utils import string_or_list
 
 
 def send_mail(

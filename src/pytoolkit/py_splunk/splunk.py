@@ -12,7 +12,7 @@ import urllib3
 
 from pytoolkit.static import SPLUNK_HEC_EVENTPATH
 from pytoolkit.utilities import NONETYPE, BaseMonitor
-from pytoolkit.utils import chunk, reformat_exception
+from pytoolkit.utilities.utils import chunk, reformat_exception
 
 splunk_log = logging.getLogger(__name__)
 
