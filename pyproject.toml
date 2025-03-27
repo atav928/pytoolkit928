@@ -16,7 +16,6 @@ license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: Implementation",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11"
@@ -46,7 +45,7 @@ addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under
 
 [tool.black]
 line-length = 127
-target-version = ["py39", "py310","py311"]
+target-version = ["py310","py311"]
 include = '\.py$'
 extend-exclude = '''
 # A regex preceded with ^/ will apply only to files and directories

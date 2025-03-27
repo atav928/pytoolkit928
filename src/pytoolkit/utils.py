@@ -91,7 +91,7 @@ def enum(*sequential: Any, **named: Any) -> type[Enum]:
 def isstring(arg: Any) -> bool:
     """Verifies if an argument is a string."""
     try:
-        return isinstance(arg, basestring)
+        return isinstance(arg, basestring) # type: ignore
     except NameError:
         return isinstance(arg, (str, bytes))
 
@@ -276,7 +276,7 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
 
 def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
     """
-    Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
     :param data: _description_
     :type data: dict[str,Any]
@@ -326,25 +326,6 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
-# TODO: see https://saturncloud.io/blog/how-to-update-a-pandas-dataframe-row-with-new-values/#:~:text=This%20can%20be%20done%20using,the%20column%20names%20as%20keys. for pandas function
-# import pandas as pd
-#
-# # create a sample dataframe
-# df = pd.DataFrame({
-#     'Name': ['John', 'Mary', 'Peter'],
-#     'Age': [30, 25, 35],
-#     'Gender': ['Male', 'Female', 'Male']
-# })
-#
-# # locate the row to update
-# row_index = df.loc[df['Name'] == 'John'].index[0]
-#
-# # update the row with new values
-# df.loc[row_index, 'Age'] = 35
-# df.loc[row_index, 'Gender'] = 'Male'
-#
-# # print the updated dataframe
-# print(df)
 def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
     """
     Convert a complex Camel to Snake case does not handle complex patterns.
