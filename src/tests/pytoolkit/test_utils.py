@@ -9,6 +9,7 @@ from unittest import mock
 
 from pytoolkit import static
 from pytoolkit.utilities import utils
+from pytoolkit.utilities.pkg_utils import sanatize_data
 
 SANTIZE_DATA = {"password": "welcome123", "username": "testuser"}
 
@@ -164,7 +165,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(len(values), 300 / 10, "Split function split events out by 30")
 
     def test_sanatize(self):
-        new_dict = utils.sanatize_data(data=SANTIZE_DATA)
+        new_dict = sanatize_data(data=SANTIZE_DATA)
         self.assertEqual(new_dict["password"], "[MASKED]")
         self.assertNotEqual(new_dict["password"], SANTIZE_DATA["password"])
 
