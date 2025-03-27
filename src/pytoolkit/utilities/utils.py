@@ -15,8 +15,7 @@ from typing import Any, List, Union
 import airportsdata
 
 from pytoolkit.decorate import error_handler
-from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
-from pytoolkit.utilities import flatten_dictionary, nested_dict
+from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4
 
 PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
 AIRPORTDATA = json.loads(json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False))
@@ -252,42 +251,29 @@ def return_hostinfo(fqdn: bool = True) -> str:
     return host
 
 
-def set_bool(value: str, default: bool = False) -> Union[str, bool]:
-    """sets bool value when pulling string from os env
-
-    Args:
-        value (str|bool, Required): the value to evaluate
-        default (bool): default return bool value. Default False
-
-    Returns:
-        (str|bool): String if certificate path is passed otherwise True|False
+def set_bool(value: Union[str, int, float], default: bool = False) -> Union[str, bool]:
     """
-    value_bool = default
-    if isinstance(value, bool):
-        value_bool = value
-    elif str(value).lower() == "true":
-        value_bool = True
-    elif str(value).lower() == "false":
-        value_bool = False
-    elif Path.exists(Path(value)):
-        value_bool = value
-    return value_bool
+    sets bool value when pulling string from os env
 
-
-def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
+    :param value: the value to evaluate
+    :type value: str|int|float
+    :param default:  default return bool value, defaults to False
+    :type default: bool, optional
+    :return: String if `value` is a file otherwise bool(True|False)
+    :rtype: Union[str, bool]
     """
-    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+    from distutils.util import strtobool
 
-    :param data: _description_
-    :type data: dict[str,Any]
-    :param keys: _description_, defaults to SANATIZE_KEYS
-    :type keys: list[str], optional
-    :return: _description_
-    :rtype: dict[str, Any]
-    """
-    flat = flatten_dictionary(data)
-    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
-    return nested_dict(new_dict)
+    if isinstance(value, str):
+        if Path.exists(Path(value)):
+            return value
+        try:
+            return bool(strtobool(value))
+        except:
+            return False
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return default
 
 
 def split(event_list: list[Any], chunk_size: int):

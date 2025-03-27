@@ -5,7 +5,7 @@ from unittest import mock
 from unittest.mock import mock_open
 from unittest import mock
 from pathlib import Path
-from pytoolkit.files import read_yaml, get_var_dir, get_config_location
+from pytoolkit.utilities.files import read_yaml, get_var_dir, get_config_location
 
 config_locations = [
     str(Path.joinpath(Path.home() / ".config/appname.yaml")),

@@ -16,7 +16,6 @@ license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: Implementation",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11"
 ]
@@ -40,11 +39,12 @@ test = [
     "isort",
     "autoflake",
     "safety",
-    "tomli"
+    "tomli",
+    "pylint"
 ]
 
 [tool.pytest.ini_options]
-addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 60"
+addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 65"
 testpaths = ["tests"]
 
 [tool.pytest]
@@ -105,13 +105,15 @@ version = {attr = "pytoolkit.__version__"}
 description = {file = "DESCRIPTION"}
 
 [tool.setuptools.packages.find]
-where = ["src", "tests"]
+where = ["src"]
 include = ["pytoolkit*"]
-exclude = ["*.xml"]
+exclude = ["*.xml", "tests/*"]
 namespaces = true
 
 [tool.coverage.run]
 source = ["src"]
+exclude = ["tests", "test"]
 
 [tool.pylint]
 max-line-length = 127
+ignore-paths='^src/tests/.*$'
