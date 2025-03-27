@@ -252,7 +252,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
     return host
 
 
-def set_bool(value: Union[str,int,float], default: bool = False) -> Union[str, bool]:
+def set_bool(value: Union[str, int, float], default: bool = False) -> Union[str, bool]:
     """
     sets bool value when pulling string from os env
 
@@ -264,6 +264,7 @@ def set_bool(value: Union[str,int,float], default: bool = False) -> Union[str, b
     :rtype: Union[str, bool]
     """
     from distutils.util import strtobool
+
     if isinstance(value, str):
         if Path.exists(Path(value)):
             return value

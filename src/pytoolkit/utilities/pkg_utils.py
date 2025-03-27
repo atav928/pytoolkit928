@@ -160,7 +160,6 @@ class Matches:
     no_match: List[Any] = field(default_factory=lambda: [])
 
 
-
 def extract_matches(iterable: Union[list[Any], None], condition: Callable[[list[Any]], Any]) -> Matches:
     """
     Returns two lists; one that matches the condition and other that does not.
