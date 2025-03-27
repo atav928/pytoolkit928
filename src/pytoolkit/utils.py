@@ -91,7 +91,7 @@ def enum(*sequential: Any, **named: Any) -> type[Enum]:
 def isstring(arg: Any) -> bool:
     """Verifies if an argument is a string."""
     try:
-        return isinstance(arg, basestring) # type: ignore
+        return isinstance(arg, basestring)  # type: ignore
     except NameError:
         return isinstance(arg, (str, bytes))
 
@@ -305,13 +305,12 @@ def split(event_list: list[Any], chunk_size: int):
     :rtype: _type_
     """
     for i in range(0, len(event_list), chunk_size):
-        yield event_list[i: i + chunk_size]
+        yield event_list[i : i + chunk_size]
 
 
 # Lambda func for chunk for quick object
 # type: ignore # pylint: disable=C3001,line-too-long
-chunk: list[Any] = lambda lst, n: [lst[i: i + n]
-                                   for i in range(0, len(lst), n)]
+chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
@@ -325,7 +324,7 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     :return: _description_
     :rtype: list[list[Any]]
     """
-    return [lst[i: i + n] for i in range(0, len(lst), n)]
+    return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
 def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
@@ -420,6 +419,7 @@ def convert_dict_to_string(_dict: dict[str, Any]) -> str:
     """
     return " ".join([f"{k} {v}" for k, v in _dict.items()])
 
+
 # Algorithms
 
 
@@ -486,7 +486,7 @@ def merge(left: list[Any], right: list[Any]):
     :rtype: _type_
     """
     result: list[Any] = []
-    while (left and right):
+    while left and right:
         if left[0] < right[0]:
             result.append(left[0])
             left.pop(0)

@@ -8,11 +8,12 @@ from pathlib import Path
 from pytoolkit.files import read_yaml, get_var_dir, get_config_location
 
 config_locations = [
-                str(Path.joinpath(Path.home() / ".config/appname.yaml")),
-                str(Path.joinpath(Path.home() / ".config/appname.yml")),
-                str(Path("/etc/infrasec-tools/appname.yaml")),
-                str(Path("/etc/infrasec-tools/appname.yml"))
+    str(Path.joinpath(Path.home() / ".config/appname.yaml")),
+    str(Path.joinpath(Path.home() / ".config/appname.yml")),
+    str(Path("/etc/infrasec-tools/appname.yaml")),
+    str(Path("/etc/infrasec-tools/appname.yml")),
 ]
+
 
 class TestReadYaml(unittest.TestCase):
     @mock.patch("builtins.open", mock_open(read_data="data"))
@@ -28,4 +29,4 @@ class TestReadYaml(unittest.TestCase):
         self.assertIs(type(get_var_dir()), str)
 
     def test_config_loc(self) -> None:
-        self.assertIs(get_config_location(config_location=config_locations),'')
+        self.assertIs(get_config_location(config_location=config_locations), None)

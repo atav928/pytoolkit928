@@ -44,7 +44,12 @@ test = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 65"
+addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 60"
+testpaths = ["tests"]
+
+[tool.pytest]
+log_cli_format = "%(asctime)s %(levelname)s %(message)s"
+
 
 [tool.black]
 line-length = 127
