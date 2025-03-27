@@ -8,7 +8,7 @@ from typing import Any, Callable, Generator, Hashable, List, Union
 
 import pandas as pd
 
-from pytoolkit.static import NONETYPE
+from pytoolkit.static import NONETYPE, SANATIZE_KEYS
 
 
 @dataclass
@@ -124,6 +124,20 @@ def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = ".") -> dict[
     )  # type: ignore
     return flat_dict
 
+def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
+    """
+    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+
+    :param data: _description_
+    :type data: dict[str,Any]
+    :param keys: _description_, defaults to SANATIZE_KEYS
+    :type keys: list[str], optional
+    :return: _description_
+    :rtype: dict[str, Any]
+    """
+    flat = flatten_dictionary(data)
+    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
+    return nested_dict(new_dict)
 
 def _nest_dict_rec(key: str, value: Any, sep: str, out: dict[str, Any]) -> None:
     """Maniplates dictionary into a nested dictionary based on seperator."""

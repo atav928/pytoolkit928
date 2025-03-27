@@ -15,8 +15,7 @@ from typing import Any, List, Union
 import airportsdata
 
 from pytoolkit.decorate import error_handler
-from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
-from pytoolkit.utilities import flatten_dictionary, nested_dict
+from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4
 
 PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
 AIRPORTDATA = json.loads(json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False))
@@ -275,22 +274,6 @@ def set_bool(value: Union[str, int, float], default: bool = False) -> Union[str,
     if isinstance(value, (int, float)):
         return bool(value)
     return default
-
-
-def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
-    """
-    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
-
-    :param data: _description_
-    :type data: dict[str,Any]
-    :param keys: _description_, defaults to SANATIZE_KEYS
-    :type keys: list[str], optional
-    :return: _description_
-    :rtype: dict[str, Any]
-    """
-    flat = flatten_dictionary(data)
-    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
-    return nested_dict(new_dict)
 
 
 def split(event_list: list[Any], chunk_size: int):
