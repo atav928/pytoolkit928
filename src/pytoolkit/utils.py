@@ -1,16 +1,16 @@
 # pylint: disable=broad-exception-caught
 """Utilities."""
 
-from enum import Enum
+import base64
+import json
 import os
-from pathlib import Path
 import platform
 import pwd
-import socket
-from typing import Any, List, Union
-import base64
 import re
-import json
+import socket
+from enum import Enum
+from pathlib import Path
+from typing import Any, List, Union
 
 import airportsdata
 
@@ -19,9 +19,7 @@ from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATI
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
 PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
-AIRPORTDATA = json.loads(
-    json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False)
-)
+AIRPORTDATA = json.loads(json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False))
 
 
 def os_plat() -> str:
@@ -93,7 +91,7 @@ def enum(*sequential: Any, **named: Any) -> type[Enum]:
 def isstring(arg: Any) -> bool:
     """Verifies if an argument is a string."""
     try:
-        return isinstance(arg, basestring)
+        return isinstance(arg, basestring)  # type: ignore
     except NameError:
         return isinstance(arg, (str, bytes))
 
@@ -127,9 +125,7 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return (
-            re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
-        )
+        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
     return (
         list(value)
         if "__iter__" in dir(value)
@@ -252,11 +248,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return (
-            ".".join(host.split(".")[:-2])
-            if ".".join(host.split(".")[:-2]) != ""
-            else ".".join(host.split(".")[:-1])
-        )
+        return ".".join(host.split(".")[:-2]) if ".".join(host.split(".")[:-2]) != "" else ".".join(host.split(".")[:-1])
     return host
 
 
@@ -282,11 +274,9 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(  # pylint: disable=W0102
-    data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:
+def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
     """
-    Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
+    Sanitize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
     :param data: _description_
     :type data: dict[str,Any]
@@ -296,10 +286,7 @@ def sanatize_data(  # pylint: disable=W0102
     :rtype: dict[str, Any]
     """
     flat = flatten_dictionary(data)
-    new_dict = {
-        key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value
-        for key, value in flat.items()
-    }
+    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
     return nested_dict(new_dict)
 
 
@@ -322,7 +309,8 @@ def split(event_list: list[Any], chunk_size: int):
 
 
 # Lambda func for chunk for quick object
-chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]  # type: ignore # pylint: disable=C3001,line-too-long
+# type: ignore # pylint: disable=C3001,line-too-long
+chunk: list[Any] = lambda lst, n: [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
 def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
@@ -339,21 +327,38 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
-def camel_to_snake(name: str):
+def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
     """
-    Convert simple Camel to Snake case does not handle complex patterns.
+    Convert a complex Camel to Snake case does not handle complex patterns.
+    Manages more complex patterns when the original CamelCase is not written correctly.
+    ie. When a `.` is introduced or another `special char`.
 
     Example:
-        >>> value = 'someValue'
+        >>> value = 'someValue.1'
         >>> camel_to_snake(value)
-        `some_value`
+        `some_value1`
 
     :param name: Value to convert in camelCase.
     :type name: str
+    :param output: Type of output. Default `str`
+    :type output: str
     :return: Snake case value.
-    :rtype: str
+    :rtype: str | List[str]
     """
-    return PATTERN.sub("_", name).lower()
+    # TODO: convert to precompiled patterns
+    names: List[str] = string_or_list(name)
+    snake_case: List[str] = []
+    for n in names:
+        # Handle any unusual characters select option on how to handle
+        n: str = re.sub(r"\ |\.|\|\,|", "", n)
+        n = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", n)
+        n = re.sub("([a-z0-9])([A-Z])", r"\1_\2", n).lower()
+        snake_case.append(n)
+    if output in ["list"]:
+        # Returns a List of Snake formated strings. Defaults to string
+        return snake_case
+    # Returns a string value
+    return ",".join(snake_case)
 
 
 def snake_to_camel(name: str) -> str:
@@ -370,6 +375,7 @@ def snake_to_camel(name: str) -> str:
     :return: snake_case value.
     :rtype: str
     """
+    # TODO: add `output='list'` param to return a list of camelCase names
     init, *temp = name.split("_")
     return "".join([init.lower(), *map(str.title, temp)])
 
@@ -412,3 +418,83 @@ def convert_dict_to_string(_dict: dict[str, Any]) -> str:
     :rtype: str
     """
     return " ".join([f"{k} {v}" for k, v in _dict.items()])
+
+
+# Algorithms
+
+
+def swap(arr: list[Any], left_pos, right_pos):
+    """
+    A Python function that swaps two adjacent values in a list.
+
+    :param arr: _description_
+    :type arr: _type_
+    :param left_pos: _description_
+    :type left_pos: _type_
+    :param right_pos: _description_
+    :type right_pos: _type_
+    """
+    tmp = arr[left_pos]
+    arr[left_pos] = arr[right_pos]
+    arr[right_pos] = tmp
+
+
+def bubble_sort(arr: list[Any]):
+    """
+    The Bubble Sort algorithm is a simple algorithm to sort a list of N numbers in ascending order. Bubble sort works by iterating through a list and checking whether the current element is larger or smaller than the next element.
+    The Bubble Sort algorithm utilizes two loops: an outer loop to iterate over each element in the input list, and an inner loop to iterate, compare and exchange a pair of values in the list. The inner loop takes (N-1) iterations while the outer loop takes N iterations. Hence, the Big-O runtime for the algorithm is the product of O(N) and O(N-1), which is O(N^2).
+
+    :param arr: _description_
+    :type arr: list[Any]
+    """
+    for _ in arr:
+        for idx in range(len(arr) - 1):
+            if arr[idx] > arr[idx + 1]:
+                swap(arr, idx, idx + 1)
+
+
+def merge_sort(lst: list[Any]) -> list[Any]:
+    """
+    Merge Sort is a divide and conquer algorithm. It consists of two parts:
+    1) splitting the original list into smaller sorted lists recursively until there is only 1 element in the list,
+    2) merging back the presorted 1-element lists into 2-element lists, 4-element lists, and so on recursively.
+
+    :param lst: _description_
+    :type lst: list[Any]
+    :return: _description_
+    :rtype: _type_
+    """
+    if len(lst) <= 1:
+        return lst
+    middle: int = len(lst) // 2
+    left: List[Any] = lst[:middle]
+    right: List[Any] = lst[middle:]
+    sleft: List[Any] = merge_sort(left)
+    sright: List[Any] = merge_sort(right)
+    return merge(sleft, sright)
+
+
+def merge(left: list[Any], right: list[Any]):
+    """
+    The Merge Sort algorithm is divided into two parts. The first part repeatedly splits the input list into smaller lists to eventually produce single-element lists. The best, worst and average runtime for this part is Θ(log N). The second part repeatedly merges and sorts the single-element lists to twice its size until the original input size is achieved. The best, worst and average runtime for this part is Θ(N). Therefore, the combined runtime is Θ(N log N).
+
+    :param left: _description_
+    :type left: _type_
+    :param right: _description_
+    :type right: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    result: list[Any] = []
+    while left and right:
+        if left[0] < right[0]:
+            result.append(left[0])
+            left.pop(0)
+        else:
+            result.append(right[0])
+            right.pop(0)
+    if left:
+        result += left
+    if right:
+        result += right
+    return result

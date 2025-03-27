@@ -1,14 +1,13 @@
 # pylint: disable=missing-function-docstring,missing-class-docstring
 """Test Utilities."""
 
-from enum import Enum
 import functools
 import re
 import unittest
+from enum import Enum
 from unittest import mock
 
-from pytoolkit import utils
-from pytoolkit import static
+from pytoolkit import static, utils
 
 SANTIZE_DATA = {"password": "welcome123", "username": "testuser"}
 
@@ -140,9 +139,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertIsInstance(invalid_response, dict)
 
     def test_chunk(self):
-        mock_hec_data = [
-            {"empty": "dict", "for": "testing", "value": x} for x in range(200)
-        ]
+        mock_hec_data = [{"empty": "dict", "for": "testing", "value": x} for x in range(200)]
         chunk_data = utils.chunk_func(mock_hec_data, 100)
         self.assertEqual(len(chunk_data), 2, "Data has been chunked into two arrays")
         self.assertEqual(

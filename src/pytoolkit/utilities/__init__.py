@@ -1,11 +1,11 @@
 # pylint: disable=line-too-long
 """Package Supplied Utilities."""
 
-from typing import Any, Callable, Generator, Hashable, List, Union
 from collections.abc import MutableMapping
-
+from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
-from dataclasses import dataclass, fields, field, is_dataclass
+from typing import Any, Callable, Generator, Hashable, List, Union
+
 import pandas as pd
 
 from pytoolkit.static import NONETYPE
@@ -67,9 +67,7 @@ def _flatten_dict_gen(
     for k, v in _d.items():
         new_key: str = k
         if extended_label:
-            new_key: str = (
-                parent_key + sep + k if (parent_key and k not in skip_item) else k
-            )  # type: ignore
+            new_key: str = parent_key + sep + k if (parent_key and k not in skip_item) else k  # type: ignore
         if isinstance(v, MutableMapping):
             yield from flatten_dict(
                 v,  # type: ignore
@@ -110,9 +108,7 @@ def flatten_dict(
     return dict(_flatten_dict_gen(_dict, parent_key, sep, extended_label, skip_item))
 
 
-def flatten_dictionary(
-    _dict: MutableMapping[Any, Any], sep: str = "."
-) -> dict[Hashable, Any]:
+def flatten_dictionary(_dict: MutableMapping[Any, Any], sep: str = ".") -> dict[Hashable, Any]:
     """
     Flatten a dictionary via pandas normalizer.
 
@@ -187,19 +183,25 @@ def set_bool(value: Union[str, bool], default: bool = False) -> Union[str, bool]
     return value_bool
 
 
-def extract_matches(
-    iterable: Union[list[Any], None], condition: Callable[[list[Any]], Any]
-) -> Matches:
+def extract_matches(iterable: Union[list[Any], None], condition: Callable[[list[Any]], Any]) -> Matches:
     """
     Returns two lists; one that matches the condition and other that does not.
      Use the condition variable to send callable functions used in a regular expression match.
+
+    Examples:
+        # Using a regular Expression search
+        m = extract_matches(iterable=files, condition=lambda x: [re.match(str(x.stem), RE_DATE_COMPILED)])
+
+        # Using a comparison of datetime values
+        m = extract_matches(iterable=m.matches, condition=lambda x: [bool(datetime.strptime(str(x.stem).split('_', maxsplit=1)[-1],'%Y%m%dT%H%M') < datetime.now(timezone.utc) - timedelta(days=days))])
+
 
     :param iterable: Lists of Strings.
     :type iterable: Union[list[Any], None]
     :param condition: Callable function or lambda function.
     :type condition: Callable[[list[Any]], Any]
-    :return: matches
-    :rtype: Matches
+    :return: matches [Tuple]
+    :rtype: Tuple[match|no_match]
     """
     res = Matches([], [])
     if not iterable:

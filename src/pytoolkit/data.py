@@ -1,8 +1,7 @@
 """Data Module."""
 
-from typing import Any
 from dataclasses import dataclass, field
-
+from typing import Any
 
 sample_headers: dict[str, int] = {"test": 1}
 

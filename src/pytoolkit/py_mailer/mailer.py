@@ -1,17 +1,16 @@
 # pylint: disable=dangerous-default-value
 """Mailer."""
 
-from typing import List, Union
-import smtplib
 import re
-
+import smtplib
 from email import encoders
-from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import List, Union
 
+from pytoolkit.static import DEFAULT_BCC, DEFAULT_CC, DEFAULT_FROM, DEFAULT_TO, ENCODING
 from pytoolkit.utils import string_or_list
-from pytoolkit.static import DEFAULT_TO, DEFAULT_FROM, DEFAULT_CC, DEFAULT_BCC, ENCODING
 
 
 def send_mail(

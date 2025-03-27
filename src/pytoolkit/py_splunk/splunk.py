@@ -1,18 +1,17 @@
 # pylint: disable=logging-fstring-interpolation
 """Splunk Integrations."""
 
-from collections import OrderedDict
 import datetime
-from typing import Any, Optional, Union
 import logging
-
+from collections import OrderedDict
 from dataclasses import dataclass
+from typing import Any, Optional, Union
 
-import urllib3
 import requests
+import urllib3
 
 from pytoolkit.static import SPLUNK_HEC_EVENTPATH
-from pytoolkit.utilities import BaseMonitor, NONETYPE
+from pytoolkit.utilities import NONETYPE, BaseMonitor
 from pytoolkit.utils import chunk, reformat_exception
 
 splunk_log = logging.getLogger(__name__)
@@ -76,9 +75,7 @@ def splunk_hec_format(
     }
     if metrics_list:
         # Build HEC Style Metrics
-        hec_json["fields"] = {
-            f"metric_name:{metric}": kwargs.pop(metric, None) for metric in metrics_list
-        }
+        hec_json["fields"] = {f"metric_name:{metric}": kwargs.pop(metric, None) for metric in metrics_list}
         hec_json["fields"] = dict(sorted(hec_json["fields"].items()))
     hec_json["event"] = {**hec_json["event"], **kwargs}
     hec_json["event"] = dict(sorted(hec_json["event"].items()))
@@ -121,17 +118,11 @@ def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
         "Authorization": f"Splunk {token}",
         "X-Splunk-Request-Channel": token,
     }
-    chunk_data: list[list[dict[str,Any]]] = (
-        chunk(hec_data, chunk_size) if len(hec_data) > chunk_size > 0 else [hec_data]
-    )
+    chunk_data: list[list[dict[str, Any]]] = chunk(hec_data, chunk_size) if len(hec_data) > chunk_size > 0 else [hec_data]
     resp_list: list[dict[str, Any]] = []
     for payload in chunk_data:
-        response: requests.Response = requests.post(
-            url, headers=headers, json=payload, verify=verify, timeout=timeout
-        )
-        splunk_log.info(
-            f'msg="uploaded splunk data response"|status_code={response.status_code}, response={response.json()}'
-        )
+        response: requests.Response = requests.post(url, headers=headers, json=payload, verify=verify, timeout=timeout)
+        splunk_log.info(f'msg="uploaded splunk data response"|status_code={response.status_code}, response={response.json()}')
         resp_list.append(
             {
                 "status_code": response.status_code,
@@ -143,7 +134,9 @@ def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
             response.raise_for_status()
         except Exception as err:
             error = reformat_exception(err)
-            splunk_log.error(
-                f'msg="Unable to upload data to splunk server"|splunk_server={server}, {error=}'
-            )
+            splunk_log.error(f'msg="Unable to upload data to splunk server"|splunk_server={server}, {error=}')
     return resp_list
+
+
+def splunk_upload_async():
+    """_summary_"""

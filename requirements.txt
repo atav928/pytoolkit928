@@ -6,4 +6,5 @@ PyYaml
 pandas
 numpy>=1.22.2
 airportsdata>=20231230
-requests>=2,<=3
+requests>=2.32.0
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
