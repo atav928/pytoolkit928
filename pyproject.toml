@@ -44,7 +44,7 @@ test = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 60"
+addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 65"
 testpaths = ["tests"]
 
 [tool.pytest]
